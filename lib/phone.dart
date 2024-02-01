@@ -9,10 +9,6 @@ class VBotPhone {
       const MethodChannel('com.vpmedia.vbot-sdk-example-dev/vbot_phone');
 
   Future<String> connect(String token) async {
-    if (!Platform.isIOS) {
-      print("connect function can only be run on iOS platform");
-      return "";
-    }
     try {
       final result =
           await _channel.invokeMethod(_methodConnect, <String, dynamic>{
