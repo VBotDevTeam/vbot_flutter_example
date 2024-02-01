@@ -54,16 +54,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    if (!Platform.isIOS) {
-      tokenController.text =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjM2Mi0zMTU0LTEwMi0xMzkifQ.DJBBBiRxal3DUPZcnjJokkCr7Jc-72yiMXtUfKNj7W4";
-    } else {
-      tokenController.text =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjMyOC0xMDkxLTMxLTExOSJ9.BmXOUrzDLID1HqT6fVPqjOj0xWXfJ49doHhJZG8wgh0";
-    }
-
-    phoneController.text = '0947782871';
-    hotlineController.text = '0963212624';
     super.initState();
     _eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
   }
