@@ -1,0 +1,4 @@
+framework module VBotPhone {
+  header "VBotPhone-Swift.h"
+  requires objc
+}
