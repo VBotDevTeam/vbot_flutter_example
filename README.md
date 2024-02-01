@@ -1,16 +1,27 @@
-# vbot_flutter_demo
+# Hướng dẫn tích hợp VBot iOS và VBot Android SDK vào app Flutter
 
-A new Flutter project.
+# Thêm SDK vào project
 
-## Getting Started
+Để tích hợp VBot vào app Flutter thì đầu tiên phải thực hiện thêm VBot SDK của từng platform theo tài liệu của mỗi loại
 
-This project is a starting point for a Flutter application.
+## Với iOS
 
-A few resources to get you started if this is your first Flutter project:
+Mở **ios/Runner.xcworkspace** bằng **xCode**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Tham khảo mục “**Cấu hình Push Notification**” và “**Cài đặt SDK**” để thêm VBot iOS SDK
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Với Android
+
+Mở thư mục **android** bằng **Android Studio**
+
+tham khảo mục “**Thêm VBot SDK vào Project**” và “**Thêm firebase vào Project**” để thêm VBot Android SDK
+
+---
+
+# Sử dụng VBot SDK
+
+Để chạy được VBot SDK trong dự án Flutter chúng ta cần sử dụng **Platform Channel**
+
+Dùng **FlutterMethodChannel** để gọi hàm và dùng **FlutterEventChannel**
+
+## Tham khảo code demo tại [https://github.com/quocdat1804/vbot_flutter_demo](https://github.com/quocdat1804/vbot_flutter_demo)
