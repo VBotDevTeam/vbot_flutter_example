@@ -15,8 +15,8 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 
 object ChannelName {
-    const val VBOT_CHANNEL = "com.vpmedia.vbot-sdk-example-dev/vbot_phone"
-    const val CALL_STATE_CHANNEL = "com.vpmedia.vbot-sdk-example-dev/call_state"
+    const val VBOT_CHANNEL = "com.vpmedia.vbot-sdk/vbot_phone"
+    const val CALL_STATE_CHANNEL = "com.vpmedia.vbot-sdk/call"
 }
 
 enum class Methods(val value: String) {
