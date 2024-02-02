@@ -6,15 +6,15 @@
 	<dict>
 		<key>.DS_Store</key>
 		<data>
-		vHdE6yMQkLsSiTvFZ+m9ounSCHQ=
+		sqzJ5xi4qyeBivKqNWEN8E1NFmA=
 		</data>
 		<key>Frameworks/.DS_Store</key>
 		<data>
-		6nfhRhRxWeCO/hyL2RYGTHxpYwA=
+		IhYNBQDz44kKOpiHcIoqMnC6Bmk=
 		</data>
 		<key>Frameworks/CocoaLumberjack.framework/CocoaLumberjack</key>
 		<data>
-		sogj+HQPWACCRSq0QibG8NuEXUI=
+		n9OFdEWmElJNifjukNmjrlqxR+M=
 		</data>
 		<key>Frameworks/CocoaLumberjack.framework/Info.plist</key>
 		<data>
@@ -30,7 +30,7 @@
 		</data>
 		<key>Frameworks/KeychainSwift.framework/KeychainSwift</key>
 		<data>
-		gJCW5MvDbkBxc7L3/vuPqlj7HM0=
+		WIQWvkGSPP8xQCp7L4KwmIhyVzM=
 		</data>
 		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -42,7 +42,7 @@
 		</data>
 		<key>Frameworks/Reachability.framework/Reachability</key>
 		<data>
-		MC7KCE6wWqp6QQFv6PlcBP9Ko3A=
+		2KkRMKlepbF4+dpTIed9miZHoXM=
 		</data>
 		<key>Frameworks/Reachability.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -54,7 +54,7 @@
 		</data>
 		<key>Frameworks/Starscream.framework/Starscream</key>
 		<data>
-		1TviUOMbg94bmhmM0LPCMu21kEA=
+		qcT/2C2N7ZDDzpjP3OwZyi/eS9I=
 		</data>
 		<key>Frameworks/Starscream.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -66,7 +66,7 @@
 		</data>
 		<key>Frameworks/VBotSIP.framework/VBotSIP</key>
 		<data>
-		K1zoar/goFDnp3lT9tG4bp2YkHQ=
+		I3FEIlatmGeXJhabgvi9vGmIXog=
 		</data>
 		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -94,7 +94,7 @@
 		</data>
 		<key>Modules/VBotPhone.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo</key>
 		<data>
-		4GgqeAJ5daplqGuuqRyPfEIHQhI=
+		HXT7/lNlWH3iIvGcxmODNJ6rXfM=
 		</data>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.abi.json</key>
 		<data>
@@ -106,7 +106,7 @@
 		</data>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		khM22DM/DNphZq9aAk/eUb9J+YM=
+		iL2LSNVQrjDaVlXAYbduK+jX288=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -139,7 +139,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			aBNZtNCynM7Bd/2i88qv3kgVHPRNljEMzJhJauVYb/8=
+			8x0k6elhjawhnY7ThPlVAPjR7XFEUJYj+c9fZHjj+yE=
 			</data>
 		</dict>
 		<key>Frameworks/CocoaLumberjack.framework/Info.plist</key>
@@ -167,7 +167,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			9L84TVAkz3/Zzkx4fAaLrA1SRYJD1V2FYAmmE0hMXGg=
+			7zJiNQ+e4B0S+ioMUuQPgcovKeGB6j+Qqk2jEh37pcQ=
 			</data>
 		</dict>
 		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeResources</key>
@@ -188,7 +188,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			VxaFq1qsDcCErBcF28OrlOS4dF72PB3nTG4epeEHVPQ=
+			m2mvUsb92I0GBkZra2nEfgTtbqyKOoQn2gJc+N9HP9M=
 			</data>
 		</dict>
 		<key>Frameworks/Reachability.framework/_CodeSignature/CodeResources</key>
@@ -209,7 +209,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			q6TQRre1h91pIfMxOPMjZXTYAvS8OS/Ejb+gpH6femE=
+			jAQfTSEUpfZRWUkfnRbBZxFbdqGPswisbXd3Hc1aiYo=
 			</data>
 		</dict>
 		<key>Frameworks/Starscream.framework/_CodeSignature/CodeResources</key>
@@ -230,7 +230,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			epnaQHLcYVU2Oc0tMSxdWdNKNae0WHCF7OBXnXBMgEA=
+			Tk65ka5pVSpLPs0efg491kWC5zHmVY7PPmrl8e8kFiM=
 			</data>
 		</dict>
 		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeResources</key>
@@ -258,7 +258,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			3Xrfg0ws0ibxgiB4OsC4u6ArDBvviOwhG62pJd5u3kM=
+			zFV1nNok3Ie8/pAxkBuMW597h8iDlNWlOhF+XJQHPVA=
 			</data>
 		</dict>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.abi.json</key>
@@ -279,7 +279,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			115XQEEAz9uBFmqQ5mcbLofZIflQPr7i6s7HPU/VvV0=
+			0162d7zXwychLb4c5ZCNgVnZi7TyGp9kTnE7jqV0WfI=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
