@@ -39,12 +39,21 @@ enum class Methods(val value: String) {
 class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     EventChannel.StreamHandler {
 
-    private lateinit var client: VBotClient
     private var tokenFirebase: String = ""
     private var result: MethodChannel.Result? = null
-    private var events: EventChannel.EventSink? = null
+
     private var isMic = true
     private var onHold = false
+
+    companion object {
+        lateinit var client: VBotClient
+
+        var events: EventChannel.EventSink? = null
+
+        fun clientExists(): Boolean {
+            return ::client.isInitialized
+        }
+    }
 
     private var listener = object : ClientListener() {
         //Lắng nghe trạng thái Account register
@@ -157,6 +166,9 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     private fun connect(call: MethodCall, result: MethodChannel.Result) {
         val token = ((call.arguments as? Map<*, *>)?.get("token") ?: "") as String
 
+        if (client.getStateAccount() == AccountRegistrationState.Ok) {
+            client.unregisterAndDeleteAccount()
+        }
         client.registerAccount(token, tokenFirebase)
 
 //        result.success(mapOf("displayName" to "Display Name"))
@@ -223,11 +235,11 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        this.events = events
+        MainActivity.events = events
     }
 
     override fun onCancel(arguments: Any?) {
-        this.events = null
+        events = null
     }
 
 }
