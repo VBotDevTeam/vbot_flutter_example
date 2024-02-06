@@ -53,7 +53,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         lateinit var client: VBotClient
 
         var events: EventChannel.EventSink? = null
-
+        var nameCall = ""
         fun clientExists(): Boolean {
             return ::client.isInitialized
         }
@@ -62,7 +62,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     private var runnable: Runnable = object : Runnable {
         override fun run() {
             val callSink = CallSink(
-                client.getRemoteAddressCall().toString(),
+                nameCall,
                 typeCall,
                 client.getDuration().toString(),
                 isMic,
@@ -130,8 +130,9 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     }
                 }
                 typeCall = stateCall
+
                 val callSink = CallSink(
-                    client.getRemoteAddressCall().toString(),
+                    nameCall,
                     stateCall,
                     client.getDuration().toString(),
                     isMic,
@@ -205,7 +206,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             val hotline = ((call.arguments as? Map<*, *>)?.get("hotline") ?: "") as String
 
             Log.d("LogApp", "phoneNumber=$phoneNumber--hotline=$hotline")
-
+            nameCall = phoneNumber
             client.addOutgoingCall(hotline, phoneNumber)
             result.success(mapOf("phoneNumber" to phoneNumber))
         } else {

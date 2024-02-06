@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.vpmedia.vbotsdksample.MainActivity.Companion.nameCall
 import kotlin.random.Random
 
 
@@ -45,6 +46,7 @@ class FirebaseService : FirebaseMessagingService() {
                                 if (MainActivity.clientExists()) {
                                     MainActivity.client.addIncomingCall(transId)
                                 }
+                                nameCall = name
                                 showIncomingCallPopup()
                             } else if (offCall == "1") {
                                 //end call
