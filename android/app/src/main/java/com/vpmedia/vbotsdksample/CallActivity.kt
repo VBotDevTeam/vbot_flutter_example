@@ -2,6 +2,7 @@ package com.vpmedia.vbotsdksample
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 
@@ -13,15 +14,14 @@ class CallActivity : AppCompatActivity() {
     }
 
     private fun registerViewsEvent() {
-        findViewById<AppCompatButton>(R.id.btnRejectCall).setOnClickListener {
+        findViewById<ImageView>(R.id.btnRejectCall).setOnClickListener {
             MainActivity.client.declineIncomingCall(true)
             val callingService = Intent(this, CallingService::class.java)
             stopService(callingService)
-
             finish()
         }
 
-        findViewById<AppCompatButton>(R.id.btnAcceptCall).setOnClickListener {
+        findViewById<ImageView>(R.id.btnAcceptCall).setOnClickListener {
             MainActivity.client.answerIncomingCall()
             finish()
         }

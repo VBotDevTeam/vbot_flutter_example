@@ -3,6 +3,8 @@ package com.vpmedia.vbotsdksample
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import com.google.firebase.messaging.FirebaseMessaging
 import com.vpmedia.sdkvbot.client.ClientListener
 import com.vpmedia.sdkvbot.client.VBotClient
@@ -44,6 +46,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
     private var isMic = true
     private var onHold = false
+    private var typeCall = ""
+    private var handler = Handler(Looper.getMainLooper())
 
     companion object {
         lateinit var client: VBotClient
@@ -52,6 +56,21 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
         fun clientExists(): Boolean {
             return ::client.isInitialized
+        }
+    }
+
+    private var runnable: Runnable = object : Runnable {
+        override fun run() {
+            val callSink = CallSink(
+                client.getRemoteAddressCall().toString(),
+                typeCall,
+                client.getDuration().toString(),
+                isMic,
+                onHold
+            )
+            events?.success(callSink.toMap())
+            handler.postDelayed(this, 1000)
+
         }
     }
 
@@ -97,6 +116,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     }
 
                     CallState.Connecting -> {
+                        handler.postDelayed(runnable, 1000)
                         "connecting"
                     }
 
@@ -105,9 +125,11 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     }
 
                     else -> {
+                        handler.removeCallbacks(runnable, 1000)
                         "disconnected"
                     }
                 }
+                typeCall = stateCall
                 val callSink = CallSink(
                     client.getRemoteAddressCall().toString(),
                     stateCall,

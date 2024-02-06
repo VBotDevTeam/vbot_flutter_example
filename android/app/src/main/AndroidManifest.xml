@@ -19,7 +19,8 @@
         android:label="vbot_flutter_demo">
         <activity
             android:name=".CallActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light"/>
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -52,6 +53,21 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <service
+            android:name=".CallingService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".AnswerBroadcast"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".HangUpBroadcast"
+            android:enabled="true"
+            android:exported="false" />
 
         <service
             android:name=".FirebaseService"

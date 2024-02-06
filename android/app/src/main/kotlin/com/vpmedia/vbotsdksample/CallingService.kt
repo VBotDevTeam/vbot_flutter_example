@@ -33,22 +33,23 @@ class CallingService : Service() {
             applicationContext,
             0,
             hangupIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val incomingCallIntent = Intent(applicationContext, CallActivity::class.java)
+        incomingCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         val incomingCallPendingIntent = PendingIntent.getActivity(
             applicationContext,
             0,
             incomingCallIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val answerIntent = Intent(applicationContext, AnswerBroadcast::class.java)
-        val answerPendingIntent = PendingIntent.getActivity(
+        val answerPendingIntent = PendingIntent.getBroadcast(
             applicationContext,
             0,
             answerIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val customView = RemoteViews(packageName, R.layout.incoming_call_popup).apply {
@@ -58,12 +59,21 @@ class CallingService : Service() {
 
         createNotificationChanel()
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setContentTitle("Tên")
+            .setContentText("Số điện thoại")
+            .setSubText("Cuộc gọi đến")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContent(customView)
             .setFullScreenIntent(incomingCallPendingIntent, true)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVibrate(longArrayOf(0, 500, 1000))
             .setAutoCancel(true)
+            .setShowWhen(true)
+            .setWhen(System.currentTimeMillis())
+            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
         startForeground(1024, notification.build())
     }
 

@@ -2,14 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:background="@color/blueO50"
+    android:layout_height="50dp"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <ImageView
-        android:layout_width="46dp"
-        android:layout_height="46dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_marginStart="16dp"
         android:scaleType="fitCenter"
         android:src="@drawable/baseline_person_24" />
@@ -26,24 +25,24 @@
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="Thinh Nguyen" />
+            tools:text="Tên" />
 
         <TextView
             android:id="@+id/tvIncommingCall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Incoming Call"
-            android:textColor="@color/white" />
+            android:textColor="@color/black" />
 
     </LinearLayout>
 
     <ImageView
         android:id="@+id/btnRejectCall"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:background="@color/red"
         android:scaleType="centerInside"
         android:src="@drawable/ic_va_phone_hangup"
@@ -51,8 +50,8 @@
 
     <ImageView
         android:id="@+id/btnAcceptCall"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
         android:background="@color/green"
