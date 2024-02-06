@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
 
 class CallActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
