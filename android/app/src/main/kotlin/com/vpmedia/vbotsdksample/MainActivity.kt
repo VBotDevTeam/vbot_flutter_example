@@ -3,6 +3,8 @@ package com.vpmedia.vbotsdksample
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import com.google.firebase.messaging.FirebaseMessaging
 import com.vpmedia.sdkvbot.client.ClientListener
 import com.vpmedia.sdkvbot.client.VBotClient
@@ -39,12 +41,38 @@ enum class Methods(val value: String) {
 class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     EventChannel.StreamHandler {
 
-    private lateinit var client: VBotClient
     private var tokenFirebase: String = ""
     private var result: MethodChannel.Result? = null
-    private var events: EventChannel.EventSink? = null
+
     private var isMic = true
     private var onHold = false
+    private var typeCall = ""
+    private var handler = Handler(Looper.getMainLooper())
+
+    companion object {
+        lateinit var client: VBotClient
+
+        var events: EventChannel.EventSink? = null
+
+        fun clientExists(): Boolean {
+            return ::client.isInitialized
+        }
+    }
+
+    private var runnable: Runnable = object : Runnable {
+        override fun run() {
+            val callSink = CallSink(
+                client.getRemoteAddressCall().toString(),
+                typeCall,
+                client.getDuration().toString(),
+                isMic,
+                onHold
+            )
+            events?.success(callSink.toMap())
+            handler.postDelayed(this, 1000)
+
+        }
+    }
 
     private var listener = object : ClientListener() {
         //Lắng nghe trạng thái Account register
@@ -88,6 +116,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     }
 
                     CallState.Connecting -> {
+                        handler.postDelayed(runnable, 1000)
                         "connecting"
                     }
 
@@ -96,9 +125,11 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     }
 
                     else -> {
+                        handler.removeCallbacks(runnable, 1000)
                         "disconnected"
                     }
                 }
+                typeCall = stateCall
                 val callSink = CallSink(
                     client.getRemoteAddressCall().toString(),
                     stateCall,
@@ -157,6 +188,9 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     private fun connect(call: MethodCall, result: MethodChannel.Result) {
         val token = ((call.arguments as? Map<*, *>)?.get("token") ?: "") as String
 
+        if (client.getStateAccount() == AccountRegistrationState.Ok) {
+            client.unregisterAndDeleteAccount()
+        }
         client.registerAccount(token, tokenFirebase)
 
 //        result.success(mapOf("displayName" to "Display Name"))
@@ -223,11 +257,11 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        this.events = events
+        MainActivity.events = events
     }
 
     override fun onCancel(arguments: Any?) {
-        this.events = null
+        events = null
     }
 
 }
