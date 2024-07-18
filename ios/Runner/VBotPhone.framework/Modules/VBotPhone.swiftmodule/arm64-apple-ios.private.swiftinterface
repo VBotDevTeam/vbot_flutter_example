@@ -1,0 +1,136 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)
+// swift-module-flags: -target arm64-apple-ios13.5 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -Onone -module-name VBotPhone
+// swift-module-flags-ignorable: -enable-bare-slash-regex
+import AVKit
+import CallKit
+import CocoaLumberjack
+import CoreTelephony
+import Foundation
+import KeychainSwift
+import PushKit
+import Reachability
+import Starscream
+import Swift
+import SystemConfiguration
+import UserNotifications
+import VBotSIP
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+extension Foundation.URLRequest {
+  public init?(urlString: Swift.String)
+}
+extension VBotSIP.VBotCallState {
+  public func stringValue() -> Swift.String
+}
+extension VBotSIP.VBotSIP {
+  public func hasActiveCall() -> Swift.Bool
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class VBotPhone : ObjectiveC.NSObject {
+  public static let sharedInstance: VBotPhone.VBotPhone
+  public var audioOutput: VBotSIP.VBotAudioControllerOutputs?
+  public var callName: Swift.String
+  public var isLogin: Swift.Bool {
+    get
+  }
+  public var userDisplayName: Swift.String? {
+    get
+  }
+  public var userToken: Swift.String? {
+    get
+  }
+  public func setup()
+  public func connect(token: Swift.String, completion: @escaping (Swift.String?, (any Swift.Error)?) -> Swift.Void)
+  public func disconnect(completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+  public func getHotlines(completion: @escaping ([VBotPhone.VBotHotline]?, (any Swift.Error)?) -> Swift.Void)
+  @objc deinit
+}
+extension VBotPhone.VBotPhone {
+  public func createError(description: Swift.String) -> Foundation.NSError
+  public func startCall(hotline: Swift.String, phoneNumber: Swift.String, completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+  public func getActiveCall() -> VBotSIP.VBotCall?
+  public func endCall(completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+  public func muteCall(completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+  public func hasAudioBluetooth() -> Swift.Bool
+  public func isSpeakerOn() -> Swift.Bool
+  public func onOffSpeaker()
+  public func holdCall(completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+  public func isCallHold() -> Swift.Bool
+  public func isCallMute() -> Swift.Bool
+  public func sendDTMF(digit: Swift.String, completion: @escaping ((any Swift.Error)?) -> Swift.Void)
+}
+extension VBotPhone.VBotPhone : Starscream.WebSocketDelegate {
+  public func didReceive(event: Starscream.WebSocketEvent, client: any Starscream.WebSocketClient)
+}
+@objc @_inheritsConvenienceInitializers public class VBotLogger : ObjectiveC.NSObject {
+  public func setup()
+  public func log(flag: CocoaLumberjack.DDLogFlag, file: Swift.String, function: Swift.String, line: Swift.UInt, _ message: Swift.String)
+  @objc override dynamic public init()
+  @objc deinit
+}
+extension Swift.String {
+  public init(apnsToken: Foundation.Data)
+}
+public enum ReachabilityError : Swift.Error {
+  case FailedToCreateWithAddress(Darwin.sockaddr_in)
+  case FailedToCreateWithHostname(Swift.String)
+  case UnableToSetCallback
+  case UnableToSetDispatchQueue
+}
+@objc public class Reachability : ObjectiveC.NSObject {
+  public enum NetworkStatus : Swift.CustomStringConvertible {
+    case notReachable
+    case reachableViaWiFi
+    case reachableVia2G
+    case reachableVia3G
+    case reachableVia4G
+    public var description: Swift.String {
+      get
+    }
+    public static func == (a: VBotPhone.Reachability.NetworkStatus, b: VBotPhone.Reachability.NetworkStatus) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public typealias NetworkChanged = (VBotPhone.Reachability) -> ()
+  public var whenConnectionChanged: VBotPhone.Reachability.NetworkChanged?
+  public var onWWAN: Swift.Bool
+  @objc public var hasHighSpeed: Swift.Bool {
+    @objc get
+  }
+  @objc public var statusString: Swift.String {
+    @objc get
+  }
+  @objc public var carrierName: Swift.String? {
+    @objc get
+  }
+  public var status: VBotPhone.Reachability.NetworkStatus {
+    get
+  }
+  public var radioStatus: VBotPhone.Reachability.NetworkStatus? {
+    get
+  }
+  required public init(reachabilityRef: SystemConfiguration.SCNetworkReachability)
+  convenience public init?(hostname: Swift.String)
+  convenience public init?(_: Swift.Bool)
+  @objc deinit
+  @objc override dynamic public var description: Swift.String {
+    @objc get
+  }
+}
+extension VBotPhone.Reachability {
+  public func startNotifier() throws
+  public func stopNotifier()
+}
+@_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc public class ReachabilityHelper : ObjectiveC.NSObject {
+  @objc deinit
+}
+public struct VBotHotline : Swift.Codable {
+  public let name: Swift.String, phoneNumber: Swift.String
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+extension VBotPhone.Reachability.NetworkStatus : Swift.Equatable {}
+extension VBotPhone.Reachability.NetworkStatus : Swift.Hashable {}

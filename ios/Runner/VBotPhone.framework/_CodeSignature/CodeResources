@@ -4,248 +4,399 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>.DS_Store</key>
-		<data>
-		sqzJ5xi4qyeBivKqNWEN8E1NFmA=
-		</data>
-		<key>Frameworks/.DS_Store</key>
-		<data>
-		IhYNBQDz44kKOpiHcIoqMnC6Bmk=
-		</data>
-		<key>Frameworks/CocoaLumberjack.framework/CocoaLumberjack</key>
-		<data>
-		n9OFdEWmElJNifjukNmjrlqxR+M=
-		</data>
 		<key>Frameworks/CocoaLumberjack.framework/Info.plist</key>
 		<data>
-		yD6rdTjz0F7ykKF8V8TSn0S3Z4s=
+		KSUaD6Ru5n0ZibxysX06anwFLKM=
+		</data>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeDirectory</key>
+		<data>
+		L6Sbr62XZ/4KEAvekU/HizKtGAQ=
+		</data>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeRequirements</key>
+		<data>
+		OnX22wWFKRSOFN1+obRynMCeyXM=
+		</data>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeRequirements-1</key>
+		<data>
+		iPeGvEOXYIBbNtSTBNCNgOBdzXo=
 		</data>
 		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeResources</key>
 		<data>
-		MH0nYizo/YFIKIJJSpd20Ae0vr0=
+		yN8WMoADWgvEOHWZmK+96fp9K7k=
+		</data>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeSignature</key>
+		<data>
+		2jmj7l5rSw0yVb/vlWAYkK/YBwk=
 		</data>
 		<key>Frameworks/KeychainSwift.framework/Info.plist</key>
 		<data>
-		8yqTqoqelGsgHL0SjkI/P10bAGA=
+		2q2Btn2POJSrD4IMfS5YLyYzYoY=
 		</data>
-		<key>Frameworks/KeychainSwift.framework/KeychainSwift</key>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeDirectory</key>
 		<data>
-		WIQWvkGSPP8xQCp7L4KwmIhyVzM=
+		PzO1vOTwK9CrebpwUtHBjPKXMA0=
+		</data>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeRequirements</key>
+		<data>
+		OnX22wWFKRSOFN1+obRynMCeyXM=
+		</data>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeRequirements-1</key>
+		<data>
+		Sh2IKAQ2QOKcaMZUqgIoQy/+s1U=
 		</data>
 		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeResources</key>
 		<data>
-		+WI8dgznqQTHkQlI21eMcl5IXDU=
+		gHXG+pnXujMW9zubTEWetHkTzDw=
+		</data>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeSignature</key>
+		<data>
+		2jmj7l5rSw0yVb/vlWAYkK/YBwk=
 		</data>
 		<key>Frameworks/Reachability.framework/Info.plist</key>
 		<data>
-		NN2UEAKQpyHnVlfnLKJRigbZys0=
+		e2er0Iyf98A7y9wOWhefDC4mSvE=
 		</data>
-		<key>Frameworks/Reachability.framework/Reachability</key>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeDirectory</key>
 		<data>
-		2KkRMKlepbF4+dpTIed9miZHoXM=
+		i8K8U78jSOMjXA+0Af8KIOaGMwo=
+		</data>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeRequirements</key>
+		<data>
+		OnX22wWFKRSOFN1+obRynMCeyXM=
+		</data>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeRequirements-1</key>
+		<data>
+		WcLKzZOhy1p7YJRRW0DUOXXFxGg=
 		</data>
 		<key>Frameworks/Reachability.framework/_CodeSignature/CodeResources</key>
 		<data>
-		HcvUeqdyDf4NvobldTTBkmIlADI=
+		0HiGLz0G1Yx+k/EL9L0Fpae/yY8=
+		</data>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeSignature</key>
+		<data>
+		2jmj7l5rSw0yVb/vlWAYkK/YBwk=
 		</data>
 		<key>Frameworks/Starscream.framework/Info.plist</key>
 		<data>
-		BrLMX5UyX3AVWQzHoG20Wh7jHas=
+		0HQD7Ps7gx5b5IWpixYlFtII75U=
 		</data>
-		<key>Frameworks/Starscream.framework/Starscream</key>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeDirectory</key>
 		<data>
-		qcT/2C2N7ZDDzpjP3OwZyi/eS9I=
+		J6mfoFWt9B4PEiygnQfDm7ExMLo=
+		</data>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeRequirements</key>
+		<data>
+		OnX22wWFKRSOFN1+obRynMCeyXM=
+		</data>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeRequirements-1</key>
+		<data>
+		E2FgKa+yKLdBJ3lFxghtSG7v+7g=
 		</data>
 		<key>Frameworks/Starscream.framework/_CodeSignature/CodeResources</key>
 		<data>
-		noFupsik5UzIRd+ONHwvWQgA17w=
+		0anRIYc/RMellIlQnnD0Saw9QhM=
+		</data>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeSignature</key>
+		<data>
+		2jmj7l5rSw0yVb/vlWAYkK/YBwk=
 		</data>
 		<key>Frameworks/VBotSIP.framework/Info.plist</key>
 		<data>
-		j0RX22FFuBLhAvdS+cS6iGHRLOU=
+		+CskgX4WcaaN3Rdt4YQXuPicdmE=
 		</data>
-		<key>Frameworks/VBotSIP.framework/VBotSIP</key>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeDirectory</key>
 		<data>
-		I3FEIlatmGeXJhabgvi9vGmIXog=
+		FSWlC0sOb/jlInQU/CBE6K7m+pI=
+		</data>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeRequirements</key>
+		<data>
+		OnX22wWFKRSOFN1+obRynMCeyXM=
+		</data>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeRequirements-1</key>
+		<data>
+		K6E5Eye0xiebwJZbvlQ5dpjCKjE=
 		</data>
 		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeResources</key>
 		<data>
-		mhOUpBDVe64/TnTPxId4KxvNU+k=
+		ya2uHroYBKVzP/NC+JE3jRXuHc4=
 		</data>
-		<key>Headers/MyFramework.h</key>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeSignature</key>
 		<data>
-		kN15u/PCQfmDsz2JgJtEAokupPo=
+		2jmj7l5rSw0yVb/vlWAYkK/YBwk=
+		</data>
+		<key>Frameworks/VialerPJSIP.framework/Versions/A/VialerPJSIP</key>
+		<data>
+		0SODMrc2XQq4vPBcQOSfkv9uA2c=
 		</data>
 		<key>Headers/VBotPhone-Swift.h</key>
 		<data>
 		03sA2jpjlw5C9Obab/U9kLUQRnY=
 		</data>
+		<key>Headers/VBotPhoneKit.h</key>
+		<data>
+		T2ixWm//3UMGL4S5NBU+DPDwK2o=
+		</data>
 		<key>Info.plist</key>
 		<data>
-		458ZOKPvWyTjdDkxrml2nWMtJHE=
-		</data>
-		<key>Modules/.DS_Store</key>
-		<data>
-		4NVRIdc+DZsumo/w5Dknu9hsgvo=
-		</data>
-		<key>Modules/VBotPhone.swiftmodule/.DS_Store</key>
-		<data>
-		c0OlEizE9FY6xg0uTHdxahEAaa8=
+		3Ln1fbSzaZOsF5+97mdHQqsZZ3c=
 		</data>
 		<key>Modules/VBotPhone.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo</key>
 		<data>
-		HXT7/lNlWH3iIvGcxmODNJ6rXfM=
+		q2kYU1EeHexAINEL2k2vyxbmx3A=
 		</data>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.abi.json</key>
 		<data>
-		FSPnLbho3G+LL9smI3XgVOqBIQ4=
+		03oCyq9GXu53L78hEJrp+sU4dEI=
+		</data>
+		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
+		<data>
+		6Rp0lRPTv1tj4gzDay+htjYzVC0=
 		</data>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<data>
-		zvSmIxqKOwxQE0d4blRoKegNcw8=
+		7QFxMKDzOeCAVX+xEmgVIpR9sK4=
+		</data>
+		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.swiftinterface</key>
+		<data>
+		6Rp0lRPTv1tj4gzDay+htjYzVC0=
 		</data>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		iL2LSNVQrjDaVlXAYbduK+jX288=
+		6iWW9I+8KcAZy+FEAXVvzGMetHs=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
 		JPWUNauM5pw7nIHctpD6GG3LqRI=
 		</data>
-		<key>VBotPhoneResources.bundle/Info.plist</key>
-		<data>
-		i7kJdzpQQ1JOND8mRlurQs7mpxE=
-		</data>
-		<key>VBotPhoneResources.bundle/VBotPhoneResources</key>
-		<data>
-		aytg0FcAtCztZ78LNIm0UrFNVyM=
-		</data>
-		<key>VBotPhoneResources.bundle/_CodeSignature/CodeResources</key>
-		<data>
-		slVll+4LnlqRgvb2Qwq265cGziQ=
-		</data>
-		<key>VBotSIP.bundle/Info.plist</key>
-		<data>
-		hw3IiI3JvAH9PWfuFVgn3QtjSBM=
-		</data>
-		<key>VBotSIP.bundle/disconnected.wav</key>
-		<data>
-		EKYMq5S5VExGpTGFvZ+0IogfFwI=
-		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
-		<key>Frameworks/CocoaLumberjack.framework/CocoaLumberjack</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			8x0k6elhjawhnY7ThPlVAPjR7XFEUJYj+c9fZHjj+yE=
-			</data>
-		</dict>
 		<key>Frameworks/CocoaLumberjack.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			39ZWYsDlDPxgGgde5DGbhdyJxjECXYlCSYzw1zc95uE=
+			BftkkNh0xAxK3ZpRqaNlYqj8uMwajcy9jMtXaKbxfvY=
+			</data>
+		</dict>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeDirectory</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			U9jUEOwxbfajt3zQ96H73g6KUmOBvv3Y2e4CWXGdOhA=
+			</data>
+		</dict>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeRequirements</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mHkgkE6rZQ51eIwFSqCwUk5qgL/HGqMt+NI3phdD+YY=
+			</data>
+		</dict>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeRequirements-1</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			5d52J/Uv58ITmVIPiZ/WoBhUmchn+C3h4Nu403CNyP8=
 			</data>
 		</dict>
 		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			G/oIkUhfSbW6zSE0IGPt/w+Dp7hcDV2M0ZTIo1+GNs8=
+			MA3bSvyvy9ix00CTNspbjK7avgvnYw8qldqrac6CbeE=
+			</data>
+		</dict>
+		<key>Frameworks/CocoaLumberjack.framework/_CodeSignature/CodeSignature</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 			</data>
 		</dict>
 		<key>Frameworks/KeychainSwift.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			SgLqoQ6uAcFY2uwJLwK5PFYV79zzREkOp/Z+tUNEUJ4=
+			2UDBV+3eSJ9r4tqwJZVLyWA7Th6EVFGqvrpXzcanCrM=
 			</data>
 		</dict>
-		<key>Frameworks/KeychainSwift.framework/KeychainSwift</key>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeDirectory</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			7zJiNQ+e4B0S+ioMUuQPgcovKeGB6j+Qqk2jEh37pcQ=
+			0fU5LQ7ma118oteJp6WottrCTx20ycjxa0ad70R29F8=
+			</data>
+		</dict>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeRequirements</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mHkgkE6rZQ51eIwFSqCwUk5qgL/HGqMt+NI3phdD+YY=
+			</data>
+		</dict>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeRequirements-1</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			0RNsaPCwTJHiFjb9AQIHZqlYVtgj+I0zMqJGuuETLps=
 			</data>
 		</dict>
 		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			njDSU30QTLUTHiuVb7eEafxs7KS9LoBBGdmPU/8o/QU=
+			Qmqxiuouu0PAhKt8HM3Z2ITnRlod91TAsTh17+Htasw=
+			</data>
+		</dict>
+		<key>Frameworks/KeychainSwift.framework/_CodeSignature/CodeSignature</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 			</data>
 		</dict>
 		<key>Frameworks/Reachability.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			C+UFOjDw8xzfzEY76dkU0ly82VnSxB8SOxTzZvf8ufo=
+			/eWl8gntGvTUrAnElCy4HEou0w4slq+8q6bNYkbTE2w=
 			</data>
 		</dict>
-		<key>Frameworks/Reachability.framework/Reachability</key>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeDirectory</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			m2mvUsb92I0GBkZra2nEfgTtbqyKOoQn2gJc+N9HP9M=
+			GF0qzVW19lCmC22O881kg00mlolnz78dBv8CbeIvSx4=
+			</data>
+		</dict>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeRequirements</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mHkgkE6rZQ51eIwFSqCwUk5qgL/HGqMt+NI3phdD+YY=
+			</data>
+		</dict>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeRequirements-1</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			I52/1FFaUD9n/pMVjQB5JS3KXvkQzIlxESY4mwNR7H8=
 			</data>
 		</dict>
 		<key>Frameworks/Reachability.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			cTynGfCAF8oWzHNznKjUjeD3ZtO2VCXMDCsJABp+Fqc=
+			iPbhCWBcGpcs4C8Lf422NLVMoWpWwU8AuIKaiGxxxbc=
+			</data>
+		</dict>
+		<key>Frameworks/Reachability.framework/_CodeSignature/CodeSignature</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 			</data>
 		</dict>
 		<key>Frameworks/Starscream.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			KQb0mlSdfh3JEK9zpT+VH1LQKEQvzXhjqK243oLvoao=
+			mvSEZ4E6S7OqoZo2LWYgmTKb9qP/jfEgQoKyNPxxnxw=
 			</data>
 		</dict>
-		<key>Frameworks/Starscream.framework/Starscream</key>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeDirectory</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			jAQfTSEUpfZRWUkfnRbBZxFbdqGPswisbXd3Hc1aiYo=
+			fSZAUdhJh05r88EXJHQp7Z4CIWE9wKJFVatX7mQxSBk=
+			</data>
+		</dict>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeRequirements</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mHkgkE6rZQ51eIwFSqCwUk5qgL/HGqMt+NI3phdD+YY=
+			</data>
+		</dict>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeRequirements-1</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nMHDJSWGgRPO1Zt+bzPd4voZrttetxrxVscw6P+1RHo=
 			</data>
 		</dict>
 		<key>Frameworks/Starscream.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			jEu36WBvbxcC4mkQnjqIAL/TJy2Cbd2Houb1uK6rCNk=
+			J07juwHr+H4w4fw65fTre56OUzlbqWZSxjy5thLEN8I=
+			</data>
+		</dict>
+		<key>Frameworks/Starscream.framework/_CodeSignature/CodeSignature</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 			</data>
 		</dict>
 		<key>Frameworks/VBotSIP.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			bTcMkKmgtraLN2GCyofpaWhcg8eIIlob6iBh7c49lN0=
+			WedWP6P+CexnY5lgQfVjmmy4D7vIV+HUlvBURPuD7d4=
 			</data>
 		</dict>
-		<key>Frameworks/VBotSIP.framework/VBotSIP</key>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeDirectory</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Tk65ka5pVSpLPs0efg491kWC5zHmVY7PPmrl8e8kFiM=
+			IQSjt1LH7D4BOZAs1SkSL8qkt7Jks/dEajrNb2MM3Dk=
+			</data>
+		</dict>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeRequirements</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mHkgkE6rZQ51eIwFSqCwUk5qgL/HGqMt+NI3phdD+YY=
+			</data>
+		</dict>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeRequirements-1</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			WQpv0FJVo8NInjYl91muix1z43NS4F+rawa+Lvn4IW4=
 			</data>
 		</dict>
 		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			TQfxd2e/lIYCn8eOQHxU1F8zqufyiRo1TtMLw55E604=
+			VdKoCMIBnnNzEP/xSprvbyBkxkBmijFrfIppHDJRbXA=
 			</data>
 		</dict>
-		<key>Headers/MyFramework.h</key>
+		<key>Frameworks/VBotSIP.framework/_CodeSignature/CodeSignature</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			eXljV3y9Nqjhg3DLF0eB+esFyWt2NFwsGXkC4YFxTbM=
+			47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 			</data>
+		</dict>
+		<key>Frameworks/VialerPJSIP.framework/Versions/A/VialerPJSIP</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ICkXvoGbPIPoPo1DTS4XPX/mMjgzGHmghQrdcMp4dfA=
+			</data>
+		</dict>
+		<key>Frameworks/VialerPJSIP.framework/Versions/Current</key>
+		<dict>
+			<key>symlink</key>
+			<string>A</string>
+		</dict>
+		<key>Frameworks/VialerPJSIP.framework/VialerPJSIP</key>
+		<dict>
+			<key>symlink</key>
+			<string>Versions/Current/VialerPJSIP</string>
 		</dict>
 		<key>Headers/VBotPhone-Swift.h</key>
 		<dict>
@@ -254,32 +405,53 @@
 			QsJw9oYkcJFK+CxCRihY9LhFELi/26F98SYLFpNMWtg=
 			</data>
 		</dict>
+		<key>Headers/VBotPhoneKit.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			3HDzfwfxMUtG9eimqCzqDSf+AM0HX/Knwv5P+UMa0x8=
+			</data>
+		</dict>
 		<key>Modules/VBotPhone.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			zFV1nNok3Ie8/pAxkBuMW597h8iDlNWlOhF+XJQHPVA=
+			pq4EvMqyw54iKWmmkZnqw5zB/wD/uw4hfgJ92+fkg7k=
 			</data>
 		</dict>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			KnRdWE4y6t4QM5zi5JDptPdHFgJy1Tku+7GLkZS2aNM=
+			27WKlbyXAISLDsZoyDceBEDRa/UjCV7ydBzA7rwPKiA=
+			</data>
+		</dict>
+		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			QR8P/lb2XlBG+kM9GV+/7f/vMHiuC6m9y9VIiOLm5YU=
 			</data>
 		</dict>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			ZOgwlS5FmiY401Bf3subbrQJqIieWjcd3Wjr7VLOxi4=
+			Yy8x7g5LvvhqwQETsjWsvzSrKjj9n1SMIn39ReGH03s=
+			</data>
+		</dict>
+		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.swiftinterface</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			QR8P/lb2XlBG+kM9GV+/7f/vMHiuC6m9y9VIiOLm5YU=
 			</data>
 		</dict>
 		<key>Modules/VBotPhone.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			0162d7zXwychLb4c5ZCNgVnZi7TyGp9kTnE7jqV0WfI=
+			D38oX++wP1RTzvROeUxf9YQJcFyrVP4eoSXbbiaws/Q=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
@@ -287,41 +459,6 @@
 			<key>hash2</key>
 			<data>
 			Bh6nMH0P7gEa6ubBbyYSZX/1B52Lb4p8ue++UDxxP9s=
-			</data>
-		</dict>
-		<key>VBotPhoneResources.bundle/Info.plist</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ypHjiNTYaxCbXdsFHXxgxzCo5uo8078XFXtbW/K7x+s=
-			</data>
-		</dict>
-		<key>VBotPhoneResources.bundle/VBotPhoneResources</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			P5egZ0O2fLp8s6JYlLc22om8Uc6kdutAK+yBs8uDJDM=
-			</data>
-		</dict>
-		<key>VBotPhoneResources.bundle/_CodeSignature/CodeResources</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			cV7yK7ocRKfFcbFElpHE4/kC5e0Y+7iQ7q5HXMT8XcY=
-			</data>
-		</dict>
-		<key>VBotSIP.bundle/Info.plist</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			i/ymnAcwqA/37kvmq6dRpji6x1DK9oBU/4/Dx1l2wzE=
-			</data>
-		</dict>
-		<key>VBotSIP.bundle/disconnected.wav</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			nY/da05RuWVuJkveWu+LKYd4TD4ihkKEqpxqCBObbvw=
 			</data>
 		</dict>
 	</dict>
