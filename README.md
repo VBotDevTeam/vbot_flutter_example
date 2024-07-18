@@ -24,4 +24,4 @@ tham khảo mục “**Thêm VBot SDK vào Project**” và “**Thêm firebase 
 
 Dùng **FlutterMethodChannel** để gọi hàm và dùng **FlutterEventChannel**
 
-## Tham khảo code demo tại [https://github.com/quocdat1804/vbot_flutter_demo](https://github.com/quocdat1804/vbot_flutter_demo)
+## Tham khảo code demo tại [https://github.com/VBotDevTeam/vbot_flutter_example](https://github.com/VBotDevTeam/vbot_flutter_example)
