@@ -161,7 +161,6 @@ enum Methods: String {
             guard let self = self else { return }
             let cache = self.client.getActiveCall() ?? cacheCall
             guard let call = cache else { return }
-            print("call.callStat \(call.callState)")
             
             if call.callState != .null && call.callState != .disconnected {
                 self.startConnectDurationTimer()
