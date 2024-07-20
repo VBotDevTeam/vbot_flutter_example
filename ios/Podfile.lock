@@ -5,19 +5,19 @@ PODS:
   - KeychainSwift (20.0.0)
   - Reachability (3.7.6)
   - Starscream (4.0.6)
-  - VBotPhoneSDK (0.1.0):
+  - VBotPhoneSDK (1.0.0):
     - KeychainSwift (= 20.0)
     - Starscream (= 4.0.6)
     - VBotSIP
-  - VBotSIP (3.7.3):
+  - VBotSIP (1.0.0):
     - CocoaLumberjack
     - Reachability
     - Vialer-pjsip-iOS
   - Vialer-pjsip-iOS (3.5)
 
 DEPENDENCIES:
-  - VBotPhoneSDK (from `https://github.com/quocdat1804/VBotSIP/releases/download/1.0.0/VBotPhoneSDK.podspec`)
-  - VBotSIP (from `https://github.com/quocdat1804/VBotSIP/releases/download/1.0.0/VBotSIP.podspec`)
+  - VBotPhoneSDK (from `https://github.com/VBotDevTeam/VBotPhoneSDK.git`)
+  - VBotSIP (from `https://github.com/VBotDevTeam/VBotSIP.git`)
 
 SPEC REPOS:
   trunk:
@@ -29,19 +29,27 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   VBotPhoneSDK:
-    :podspec: https://github.com/quocdat1804/VBotSIP/releases/download/1.0.0/VBotPhoneSDK.podspec
+    :git: https://github.com/VBotDevTeam/VBotPhoneSDK.git
   VBotSIP:
-    :podspec: https://github.com/quocdat1804/VBotSIP/releases/download/1.0.0/VBotSIP.podspec
+    :git: https://github.com/VBotDevTeam/VBotSIP.git
+
+CHECKOUT OPTIONS:
+  VBotPhoneSDK:
+    :commit: ff3c5cb43aefcf69f9e29169d53d3579095764a2
+    :git: https://github.com/VBotDevTeam/VBotPhoneSDK.git
+  VBotSIP:
+    :commit: 479cc8e12f6323ee0c9c3c41655236c8d91ea38a
+    :git: https://github.com/VBotDevTeam/VBotSIP.git
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
   KeychainSwift: 0ce6a4d13f7228054d1a71bb1b500448fb2ab837
   Reachability: fd0ecd23705e2599e4cceeb943222ae02296cbc6
   Starscream: fb2c4510bebf908c62bd383bcf05e673720e91fd
-  VBotPhoneSDK: 59c836c1c27fbc09828260f63fcbec0d3994f639
-  VBotSIP: c02d245d4082ec63abe3af008fe95ab722de9d24
+  VBotPhoneSDK: f1f62146fec0f07aa69366dfd74fa246ab586994
+  VBotSIP: 59e41f992a911ebd4cf3f9b0baf7e0ba7cc2e14d
   Vialer-pjsip-iOS: 5ceea9f0e46a7748b2542ba04ca7dacf4de4b51c
 
-PODFILE CHECKSUM: 67d83a796e8a1bd46d36b1a44c0c0a9d4007424a
+PODFILE CHECKSUM: 08dd933c89e68f243ba55513e99be7b7fe563bf0
 
 COCOAPODS: 1.15.2
