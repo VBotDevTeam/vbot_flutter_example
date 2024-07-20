@@ -1,6 +1,7 @@
 name: vbot_flutter_demo
 description: "Demo VBot SDK for Flutter"
 publish_to: "none"
+version: 1.0.0+1
 
 environment:
   sdk: ">=3.2.4 <4.0.0"
