@@ -37,6 +37,7 @@ final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
 class _MyHomePageState extends State<MyHomePage> {
   final tokenController = TextEditingController();
   final phoneController = TextEditingController();
+  final hotlineController = TextEditingController();
 
   String displayName = "";
   final phone = VBotPhone();
@@ -64,23 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // _eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
     tokenController.text =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjM2Mi0zMTU0LTEwMi0xNDcifQ.V2uakI8cWDHH7CerIcHUY6zGylNIAQ1T22K06T03d7w';
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU1Mi0xNTQtMTkzIn0.3Nn1DAXDxXsDMnJ5pKarvik9Wxw1-JjC6NICL8Ox9Co';
   }
-
-  // void _onEvent(Object? event) {
-  //   print('qdatttt call state $event');
-  //   setState(() {
-  //     callState = "$event";
-  //   });
-  // }
-
-  // void _onError(Object error) {
-  //   setState(() {
-  //     callState = 'unknown';
-  //   });
-  // }
 
   void _connect() async {
     setState(() {
@@ -125,8 +112,10 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
     try {
-      final calleeName = await phone.startCall(
-          selectedHotline!.phoneNumber, phoneController.text);
+      String hotlineNumber =
+          hotlineController.text != "" ? selectedHotline!.phoneNumber : '';
+      final calleeName =
+          await phone.startCall(hotlineNumber, phoneController.text);
       callee = calleeName ?? "Error";
     } catch (e) {
       print("call exception: $e");
@@ -155,11 +144,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       : snapshot.data!.state,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                if (snapshot.data!.state == 'confirmed')
-                  Wrap(
-                    spacing: 8.0,
-                    runSpacing: 4.0,
-                    children: [
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: [
+                    if (snapshot.data!.state == 'confirmed') ...[
                       FilledButton(
                         onPressed: muteMic,
                         child: Text(snapshot.data!.isMute ? "Unmute" : "Mute"),
@@ -168,16 +157,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         onPressed: onoffSpeaker,
                         child: const Text("Speaker"),
                       ),
+                    ],
+                    if (snapshot.data!.state == 'confirmed' ||
+                        snapshot.data!.state == 'calling')
                       FilledButton(
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
+                          backgroundColor: WidgetStateProperty.all<Color>(
                               Theme.of(context).colorScheme.error),
                         ),
                         onPressed: hangupCall,
                         child: const Text("Hangup"),
                       ),
-                    ],
-                  ),
+                  ],
+                ),
               ],
             );
           } else {
@@ -256,9 +248,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         value: selectedHotline,
                         hint: const Text('Select Hotline'),
                         onChanged: (VBotHotline? newValue) {
-                          setState(() {
-                            selectedHotline = newValue;
-                          });
+                          if (newValue != null) {
+                            setState(() {
+                              hotlineController.text = newValue.name;
+                              selectedHotline = newValue;
+                            });
+                          }
                         },
                         items: hotlines.map<DropdownMenuItem<VBotHotline>>(
                             (VBotHotline value) {
@@ -269,6 +264,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         }).toList(),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: hotlineController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Hotline',
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -283,19 +286,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: _call,
                     child: const Text("Call"),
                   ),
-                  // if (isCalling) ...[
-                  //   const CircularProgressIndicator()
-                  // ] else ...[
-                  //   if (callState != "disconnected" && callState != "") ...[
-                  //     Text(callee),
-                  //     Text(callState),
-                  //   ] else ...[
-                  //     FilledButton(
-                  //       onPressed: _call,
-                  //       child: const Text("Call"),
-                  //     ),
-                  //   ],
-                  // ],
                   const SizedBox(height: 20),
                   _callView(),
                 ],
