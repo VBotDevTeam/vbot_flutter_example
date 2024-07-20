@@ -1,5 +1,5 @@
-# Uncomment the next line to define a global platform for your project
- platform :ios, '13.5'
+
+platform :ios, '13.5'
 
 
 target 'Runner' do
@@ -7,6 +7,7 @@ target 'Runner' do
   
   pod 'VBotPhoneSDK', :git => 'https://github.com/VBotDevTeam/VBotPhoneSDK.git'
   pod 'VBotSIP', :git => 'https://github.com/VBotDevTeam/VBotSIP.git'
+  pod 'Vialer-pjsip-iOS', :git => 'https://github.com/VBotDevTeam/VBotPJSIP.git'
   
   target 'RunnerTests' do
     inherit! :search_paths
