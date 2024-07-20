@@ -1,8 +1,15 @@
+# Uncomment the next line to define a global platform for your project
  platform :ios, '13.5'
 
 
 target 'Runner' do
   use_frameworks! :linkage => :static
+#  pod 'VBotSDK', :path => '/Users/datnguyenquoc/1qdatt_XCodePrj/VBotSDK/VBotSDK'
+#  pod 'VBotSIP', :path => '/Users/datnguyenquoc/1qdatt_XCodePrj/VBotSDK-2024/VBotSIP'
+  
+#  pod 'VBotPhoneSDK', :path => '/Users/datnguyenquoc/1qdatt_XCodePrj/VBotSDK/VBotPhone3'
+#  pod 'VBotSIP', :path => '/Users/datnguyenquoc/1qdatt_XCodePrj/VBotSDK-2024/VBotSIP'
+
   
   pod 'VBotPhoneSDK', :podspec => 'https://github.com/quocdat1804/VBotSIP/releases/download/1.0.0/VBotPhoneSDK.podspec'
   pod 'VBotSIP', :podspec => 'https://github.com/quocdat1804/VBotSIP/releases/download/1.0.0/VBotSIP.podspec'
