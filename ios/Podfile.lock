@@ -18,6 +18,7 @@ PODS:
 DEPENDENCIES:
   - VBotPhoneSDK (from `https://github.com/VBotDevTeam/VBotPhoneSDK.git`)
   - VBotSIP (from `https://github.com/VBotDevTeam/VBotSIP.git`)
+  - Vialer-pjsip-iOS (from `https://github.com/VBotDevTeam/VBotPJSIP.git`)
 
 SPEC REPOS:
   trunk:
@@ -25,13 +26,14 @@ SPEC REPOS:
     - KeychainSwift
     - Reachability
     - Starscream
-    - Vialer-pjsip-iOS
 
 EXTERNAL SOURCES:
   VBotPhoneSDK:
     :git: https://github.com/VBotDevTeam/VBotPhoneSDK.git
   VBotSIP:
     :git: https://github.com/VBotDevTeam/VBotSIP.git
+  Vialer-pjsip-iOS:
+    :git: https://github.com/VBotDevTeam/VBotPJSIP.git
 
 CHECKOUT OPTIONS:
   VBotPhoneSDK:
@@ -40,6 +42,9 @@ CHECKOUT OPTIONS:
   VBotSIP:
     :commit: 479cc8e12f6323ee0c9c3c41655236c8d91ea38a
     :git: https://github.com/VBotDevTeam/VBotSIP.git
+  Vialer-pjsip-iOS:
+    :commit: 8dda620795f83d9393a3d72fe28b9583aec9ba2c
+    :git: https://github.com/VBotDevTeam/VBotPJSIP.git
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
@@ -50,6 +55,6 @@ SPEC CHECKSUMS:
   VBotSIP: 59e41f992a911ebd4cf3f9b0baf7e0ba7cc2e14d
   Vialer-pjsip-iOS: 5ceea9f0e46a7748b2542ba04ca7dacf4de4b51c
 
-PODFILE CHECKSUM: 08dd933c89e68f243ba55513e99be7b7fe563bf0
+PODFILE CHECKSUM: dacba606415dd10392b210b77b641dd827906822
 
 COCOAPODS: 1.15.2
