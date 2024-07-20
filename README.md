@@ -24,4 +24,7 @@ tham khảo mục “**Thêm VBot SDK vào Project**” và “**Thêm firebase 
 
 Dùng **FlutterMethodChannel** để gọi hàm và dùng **FlutterEventChannel**
 
+## Documents
+[Hướng dẫn cài đặt](https://ribbon-lemon-74e.notion.site/VBot-iOS-SDK-8f628d594d354c018fb596b0c9de90cf)
+
 ## Tham khảo code demo tại [https://github.com/VBotDevTeam/vbot_flutter_example](https://github.com/VBotDevTeam/vbot_flutter_example)
