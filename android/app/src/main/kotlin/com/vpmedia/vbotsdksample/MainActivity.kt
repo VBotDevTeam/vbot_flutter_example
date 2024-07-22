@@ -224,7 +224,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
     private fun mute(call: MethodCall, result: MethodChannel.Result) {
         isMic = !isMic
-        client.isMic(isMic)
+        client.setMute(isMic)
     }
 
     private fun getHotline(call: MethodCall, result: MethodChannel.Result) {
