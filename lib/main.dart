@@ -105,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
       isCalling = true; // Show loading indicator
     });
 
-    if (phoneController.text.isEmpty || selectedHotline == null) {
+    if (phoneController.text.isEmpty) {
       setState(() {
         isCalling = false; // Hide loading indicator
       });
