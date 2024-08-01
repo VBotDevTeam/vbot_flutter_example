@@ -3,58 +3,44 @@ PODS:
     - CocoaLumberjack/Core (= 3.8.5)
   - CocoaLumberjack/Core (3.8.5)
   - KeychainSwift (20.0.0)
-  - Reachability (3.7.6)
   - Starscream (4.0.6)
   - VBotPhoneSDK (1.0.0):
     - KeychainSwift (= 20.0)
     - Starscream (= 4.0.6)
-    - VBotSIP
-  - VBotSIP (1.0.0):
+    - VBotSIP (= 1.2.0)
+  - VBotSIP (1.2.0):
     - CocoaLumberjack
-    - Reachability
     - Vialer-pjsip-iOS
   - Vialer-pjsip-iOS (3.5)
 
 DEPENDENCIES:
   - VBotPhoneSDK (from `https://github.com/VBotDevTeam/VBotPhoneSDK.git`)
-  - VBotSIP (from `https://github.com/VBotDevTeam/VBotSIP.git`)
-  - Vialer-pjsip-iOS (from `https://github.com/VBotDevTeam/VBotPJSIP.git`)
 
 SPEC REPOS:
   trunk:
     - CocoaLumberjack
     - KeychainSwift
-    - Reachability
     - Starscream
+    - VBotSIP
+    - Vialer-pjsip-iOS
 
 EXTERNAL SOURCES:
   VBotPhoneSDK:
     :git: https://github.com/VBotDevTeam/VBotPhoneSDK.git
-  VBotSIP:
-    :git: https://github.com/VBotDevTeam/VBotSIP.git
-  Vialer-pjsip-iOS:
-    :git: https://github.com/VBotDevTeam/VBotPJSIP.git
 
 CHECKOUT OPTIONS:
   VBotPhoneSDK:
-    :commit: ff3c5cb43aefcf69f9e29169d53d3579095764a2
+    :commit: d4cdb16d2c2f3e4df1a4aa07f5baa89ec629f396
     :git: https://github.com/VBotDevTeam/VBotPhoneSDK.git
-  VBotSIP:
-    :commit: 479cc8e12f6323ee0c9c3c41655236c8d91ea38a
-    :git: https://github.com/VBotDevTeam/VBotSIP.git
-  Vialer-pjsip-iOS:
-    :commit: 8dda620795f83d9393a3d72fe28b9583aec9ba2c
-    :git: https://github.com/VBotDevTeam/VBotPJSIP.git
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
   KeychainSwift: 0ce6a4d13f7228054d1a71bb1b500448fb2ab837
-  Reachability: fd0ecd23705e2599e4cceeb943222ae02296cbc6
   Starscream: fb2c4510bebf908c62bd383bcf05e673720e91fd
-  VBotPhoneSDK: f1f62146fec0f07aa69366dfd74fa246ab586994
-  VBotSIP: 59e41f992a911ebd4cf3f9b0baf7e0ba7cc2e14d
+  VBotPhoneSDK: 333a00826a3eae36cb228c6fdc620a92592a9e4c
+  VBotSIP: de2639f1e450fe46b9fa58118cafd4e6d292be83
   Vialer-pjsip-iOS: 5ceea9f0e46a7748b2542ba04ca7dacf4de4b51c
 
-PODFILE CHECKSUM: dacba606415dd10392b210b77b641dd827906822
+PODFILE CHECKSUM: 37f11d820500b2a859eab40d856d8ba1a9aa55f9
 
 COCOAPODS: 1.15.2

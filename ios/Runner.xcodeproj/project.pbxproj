@@ -199,7 +199,7 @@
 				97C146EC1CF9000F007C117D /* Resources */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				DF3BB8BB2C4B842E005A0723 /* Embed Frameworks */,
-				9CB561AE7911A23BD4CE3908 /* [CP] Copy Pods Resources */,
+				B597ABE183E24BC2AD1B1318 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -324,7 +324,7 @@
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
 		};
-		9CB561AE7911A23BD4CE3908 /* [CP] Copy Pods Resources */ = {
+		B597ABE183E24BC2AD1B1318 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -478,6 +478,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Runner",
+					/Users/datnguyenquoc/Documents/GitHub/vbot_flutter_demo/ios/Pods/VBotPhoneSDK/VBotPhoneSDK.framework/Frameworks,
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
@@ -670,6 +671,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Runner",
+					/Users/datnguyenquoc/Documents/GitHub/vbot_flutter_demo/ios/Pods/VBotPhoneSDK/VBotPhoneSDK.framework/Frameworks,
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -711,6 +713,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Runner",
+					/Users/datnguyenquoc/Documents/GitHub/vbot_flutter_demo/ios/Pods/VBotPhoneSDK/VBotPhoneSDK.framework/Frameworks,
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "PJ_AUTOCONF=1";
 				INFOPLIST_FILE = Runner/Info.plist;

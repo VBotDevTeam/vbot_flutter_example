@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     tokenController.text =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU1Mi0xNTQtMTkzIn0.3Nn1DAXDxXsDMnJ5pKarvik9Wxw1-JjC6NICL8Ox9Co';
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU2Ny0xNTYtMTk3In0.cy4pzmqY-Lc22qQhUsQ6tMQ6bEYBh5yZ4DrM9di8qWA';
   }
 
   void _connect() async {
