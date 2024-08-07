@@ -11,7 +11,7 @@ class AnswerBroadcast : BroadcastReceiver() {
         Log.d("jhdjshdjs", "AnswerBroadcast")
 
         context?.let { context ->
-            MainActivity.client.answerIncomingCall()
+            MainActivity.client.answerCall()
             val i = Intent(context, CallingService::class.java)
             context.stopService(i)
             Log.d("jhdjshdjs", "AnswerBroadcastp0?.let")

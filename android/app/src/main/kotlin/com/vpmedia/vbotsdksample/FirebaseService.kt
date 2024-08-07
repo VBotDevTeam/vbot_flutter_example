@@ -51,7 +51,7 @@ class FirebaseService : FirebaseMessagingService() {
                             } else if (offCall == "1") {
                                 //end call
                                 if (MainActivity.clientExists()) {
-                                    MainActivity.client.hangupCall()
+                                    MainActivity.client.endCall()
                                 }
                             }
                         }

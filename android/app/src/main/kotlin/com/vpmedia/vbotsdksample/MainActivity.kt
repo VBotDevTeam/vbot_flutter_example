@@ -34,7 +34,10 @@ enum class Methods(val value: String) {
     STARTCALL("startCall"),
     GETHOTLINE("getHotlines"),
     HANGUP("hangup"),
-    MUTE("mute")
+    MUTE("mute"),
+    SPEAKER("speaker"),
+    SENDDTMF("sendDTMF"),
+    HOLD("hold"),
 }
 
 
@@ -42,9 +45,10 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     EventChannel.StreamHandler {
 
     private var tokenFirebase: String = ""
-    private var result: MethodChannel.Result? = null
+    private var resultWrapper: ResultWrapper? = null
 
     private var isMic = true
+    private var isSpeaker = true
     private var onHold = false
     private var typeCall = ""
     private var handler = Handler(Looper.getMainLooper())
@@ -80,11 +84,25 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             Log.d("LogApp", "state=$status")
             when (status) {
                 AccountRegistrationState.Ok -> {
-                    result?.success(mapOf("displayName" to client.getAccountUsername()))
+                    try {
+                        Log.d("LogApp", "AccountRegistrationState.Ok")
+                        resultWrapper?.success(mapOf("displayName" to client.getAccountUsername()))
+                    } catch (e: Exception) {
+                        Log.d("LogApp", "error=$e")
+                        return
+                    }
+
                 }
 
                 AccountRegistrationState.Error -> {
-                    result?.error("ERROR", reason, null)
+                    try {
+                        Log.d("LogApp", "AccountRegistrationState.Error")
+                        resultWrapper?.error("ERROR", reason, null)
+                    } catch (e: Exception) {
+                        Log.d("LogApp", "error=$e")
+                        return
+                    }
+
                 }
 
                 else -> {
@@ -96,9 +114,11 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         //Lắng nghe lỗi
         override fun onErrorCode(erCode: Int, message: String) {
             super.onErrorCode(erCode, message)
-            result?.error(erCode.toString(), message, null)
+            Log.d("LogApp", "onErrorCode: $erCode -- $message")
 
-            Log.d("LogApp", "Error: $erCode -- $message")
+            resultWrapper?.error(erCode.toString(), message, null)
+
+
         }
 
         override fun onCallState(state: CallState) {
@@ -146,7 +166,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         client = VBotClient(context)
         client.addListener(listener)
-        client.startClient()
+        client.setup()
         getTokenFirebase()
         GeneratedPluginRegistrant.registerWith(flutterEngine);
         MethodChannel(
@@ -175,13 +195,16 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        this.result = result
+        resultWrapper = ResultWrapper(result)
         when (call.method) {
             Methods.CONNECT.value -> connect(call, result)
             Methods.STARTCALL.value -> startCall(call, result)
             Methods.GETHOTLINE.value -> getHotline(call, result)
             Methods.HANGUP.value -> hangUp(call, result)
             Methods.MUTE.value -> mute(call, result)
+            Methods.SPEAKER.value -> speaker(call, result)
+            Methods.SENDDTMF.value -> sendDTMF(call, result)
+            Methods.HOLD.value -> holdCall(call, result)
             else -> result.notImplemented()
         }
     }
@@ -192,7 +215,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         if (client.getStateAccount() == AccountRegistrationState.Ok) {
             client.unregisterAndDeleteAccount()
         }
-        client.registerAccount(token, tokenFirebase)
+        client.connect(token, tokenFirebase)
 
 //        result.success(mapOf("displayName" to "Display Name"))
     }
@@ -207,7 +230,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
             Log.d("LogApp", "phoneNumber=$phoneNumber--hotline=$hotline")
             nameCall = phoneNumber
-            client.addOutgoingCall(hotline, phoneNumber)
+            client.startCall(hotline, phoneNumber)
             result.success(mapOf("phoneNumber" to phoneNumber))
         } else {
             //check quyền
@@ -224,7 +247,22 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
     private fun mute(call: MethodCall, result: MethodChannel.Result) {
         isMic = !isMic
-        client.setMute(isMic)
+        client.muteCall(isMic)
+    }
+
+    private fun speaker(call: MethodCall, result: MethodChannel.Result) {
+        isSpeaker = !isSpeaker
+        client.onOffSpeaker(isSpeaker)
+    }
+
+    private fun sendDTMF(call: MethodCall, result: MethodChannel.Result) {
+        val value = ((call.arguments as? Map<*, *>)?.get("value") ?: "") as String
+        client.sendDTMF(value)
+    }
+
+    private fun holdCall(call: MethodCall, result: MethodChannel.Result) {
+        onHold = !onHold
+        client.holdCall(onHold)
     }
 
     private fun getHotline(call: MethodCall, result: MethodChannel.Result) {
@@ -232,7 +270,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
         CoroutineScope(Dispatchers.IO).launch {
             runBlocking {
-                val list = client.getListHotline()
+                val list = client.getHotlines()
                 Log.d("LogApp", "list $list")
                 if (list != null) {
                     val listMap: ArrayList<Map<String, String>> = arrayListOf()
@@ -250,7 +288,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     private fun hangUp(call: MethodCall, result: MethodChannel.Result) {
-        client.hangupCall()
+        client.endCall()
     }
 
     private fun hasPermission(context: Context, permission: String): Boolean {
@@ -282,5 +320,17 @@ open class CallSink(
             "isMute" to isMute,
             "onHold" to onHold,
         )
+    }
+}
+
+class ResultWrapper(private var result: MethodChannel.Result?) {
+    fun success(data: Any?) {
+        result?.success(data)
+        result = null
+    }
+
+    fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+        result?.error(errorCode, errorMessage, errorDetails)
+        result = null
     }
 }
