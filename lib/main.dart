@@ -52,9 +52,6 @@ class _MyHomePageState extends State<MyHomePage> {
   VBotHotline? selectedHotline;
   List<VBotHotline> hotlines = [];
 
-  // static const EventChannel _eventChannel =
-  //     EventChannel('com.vpmedia.vbot-sdk/call');
-
   Stream<VBotSink> streamCallStateFromNative() {
     const callStateChannel = EventChannel('com.vpmedia.vbot-sdk/call');
     return callStateChannel.receiveBroadcastStream().map((event) {
@@ -65,8 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    tokenController.text =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU2Ny0xNTYtMTk3In0.cy4pzmqY-Lc22qQhUsQ6tMQ6bEYBh5yZ4DrM9di8qWA';
   }
 
   void _connect() async {
