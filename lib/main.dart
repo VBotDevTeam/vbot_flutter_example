@@ -46,7 +46,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isLoading = false;
   bool isCalling = false;
   bool isConnected = false;
-
   String callState = "";
   String callee = "";
 
@@ -316,7 +315,9 @@ class _MyHomePageState extends State<MyHomePage> {
     final _ = await phone.mute();
   }
 
-  void onoffSpeaker() {}
+  void onoffSpeaker() async {
+    final _ = await phone.speaker();
+  }
 
   void hangupCall() async {
     final _ = await phone.hangup();
