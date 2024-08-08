@@ -25,14 +25,14 @@ class FirebaseService : FirebaseMessagingService() {
             hashMap[key] = remoteMessage.data[key].toString()
         }
         val type = hashMap["type"]
-        Log.d("logCall", "data=$hashMap")
+        Log.d("VBotPhone", "data=$hashMap")
         if (remoteMessage.notification != null) {
             val title = remoteMessage.notification!!.title
             val message = remoteMessage.notification!!.body
-            Log.d("logCall", "noti thường -- title=$title -- message=$message")
+            Log.d("VBotPhone", "noti thường -- title=$title -- message=$message")
             sendNotification("$title", "$message")
         } else {
-            Log.d("logCall", "noti data")
+            Log.d("VBotPhone", "noti data")
             try {
                 when (type) {
                     "3" -> {

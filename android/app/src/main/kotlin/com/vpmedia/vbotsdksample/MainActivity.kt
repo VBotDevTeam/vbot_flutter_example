@@ -31,6 +31,7 @@ object ChannelName {
 
 enum class Methods(val value: String) {
     CONNECT("connect"),
+    DISCONNECT("disconnect"),
     STARTCALL("startCall"),
     GETHOTLINE("getHotlines"),
     HANGUP("hangup"),
@@ -81,14 +82,14 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     private var listener = object : ClientListener() {
         //Lắng nghe trạng thái Account register
         override fun onAccountRegistrationState(status: AccountRegistrationState, reason: String) {
-            Log.d("LogApp", "state=$status")
+            Log.d("VBotPhone", "state=$status")
             when (status) {
                 AccountRegistrationState.Ok -> {
                     try {
-                        Log.d("LogApp", "AccountRegistrationState.Ok")
+                        Log.d("VBotPhone", "AccountRegistrationState.Ok")
                         resultWrapper?.success(mapOf("displayName" to client.getAccountUsername()))
                     } catch (e: Exception) {
-                        Log.d("LogApp", "error=$e")
+                        Log.d("VBotPhone", "error=$e")
                         return
                     }
 
@@ -96,10 +97,10 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
                 AccountRegistrationState.Error -> {
                     try {
-                        Log.d("LogApp", "AccountRegistrationState.Error")
+                        Log.d("VBotPhone", "AccountRegistrationState.Error")
                         resultWrapper?.error("ERROR", reason, null)
                     } catch (e: Exception) {
-                        Log.d("LogApp", "error=$e")
+                        Log.d("VBotPhone", "error=$e")
                         return
                     }
 
@@ -114,7 +115,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         //Lắng nghe lỗi
         override fun onErrorCode(erCode: Int, message: String) {
             super.onErrorCode(erCode, message)
-            Log.d("LogApp", "onErrorCode: $erCode -- $message")
+            Log.d("VBotPhone", "onErrorCode: $erCode -- $message")
 
             resultWrapper?.error(erCode.toString(), message, null)
 
@@ -124,7 +125,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         override fun onCallState(state: CallState) {
             super.onCallState(state)
             runOnUiThread {
-                Log.d("LogApp", "state: $state")
+                Log.d("VBotPhone", "state: $state")
                 val stateCall = when (state) {
 
                     CallState.Calling, CallState.Early -> {
@@ -198,6 +199,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         resultWrapper = ResultWrapper(result)
         when (call.method) {
             Methods.CONNECT.value -> connect(call, result)
+            Methods.DISCONNECT.value -> disconnect(call, result)
             Methods.STARTCALL.value -> startCall(call, result)
             Methods.GETHOTLINE.value -> getHotline(call, result)
             Methods.HANGUP.value -> hangUp(call, result)
@@ -216,8 +218,11 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             client.unregisterAndDeleteAccount()
         }
         client.connect(token, tokenFirebase)
+    }
 
-//        result.success(mapOf("displayName" to "Display Name"))
+    private fun disconnect(call: MethodCall, result: MethodChannel.Result) {
+        val isDone = client.disconnect();
+        resultWrapper?.success(mapOf("disconnect" to isDone))
     }
 
     private fun startCall(call: MethodCall, result: MethodChannel.Result) {
@@ -228,7 +233,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             val phoneNumber = ((call.arguments as? Map<*, *>)?.get("phoneNumber") ?: "") as String
             val hotline = ((call.arguments as? Map<*, *>)?.get("hotline") ?: "") as String
 
-            Log.d("LogApp", "phoneNumber=$phoneNumber--hotline=$hotline")
+            Log.d("VBotPhone", "phoneNumber=$phoneNumber--hotline=$hotline")
             nameCall = phoneNumber
             client.startCall(hotline, phoneNumber)
             result.success(mapOf("phoneNumber" to phoneNumber))
@@ -266,12 +271,12 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     private fun getHotline(call: MethodCall, result: MethodChannel.Result) {
-        Log.d("LogApp", "getHotline")
+        Log.d("VBotPhone", "getHotline")
 
         CoroutineScope(Dispatchers.IO).launch {
             runBlocking {
                 val list = client.getHotlines()
-                Log.d("LogApp", "list $list")
+                Log.d("VBotPhone", "list $list")
                 if (list != null) {
                     val listMap: ArrayList<Map<String, String>> = arrayListOf()
 
@@ -279,7 +284,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                         listMap.add(mapOf("name" to i.name, "phoneNumber" to i.phoneNumber))
                     }
 
-                    Log.d("LogApp", "map=$listMap")
+                    Log.d("VBotPhone", "map=$listMap")
 
                     result.success(listMap)
                 }
