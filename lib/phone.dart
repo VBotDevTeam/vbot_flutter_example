@@ -4,10 +4,12 @@ import 'package:vbot_flutter_demo/main.dart';
 
 class VBotPhone {
   final String _methodConnect = "connect";
+  final String _methodDisconnect = "disconnect";
   final String _methodStartCall = "startCall";
   final String _methodGetHotlines = "getHotlines";
   final String _methodHangup = "hangup";
   final String _methodMute = "mute";
+  final String _methodSpeaker = "speaker";
 
   final MethodChannel _channel =
       const MethodChannel('com.vpmedia.vbot-sdk/vbot_phone');
@@ -19,7 +21,6 @@ class VBotPhone {
         'token': token,
       });
       final res = result as Map;
-      print(res);
       return res["displayName"];
     } catch (e) {
       scaffoldMessengerKey.currentState?.showSnackBar(
@@ -28,6 +29,21 @@ class VBotPhone {
         ),
       );
       return null;
+    }
+  }
+
+  Future<bool> disconnect() async {
+    try {
+      final result = await _channel.invokeMethod(_methodDisconnect);
+      final res = result as Map;
+      return res["disconnect"];
+    } catch (e) {
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+        ),
+      );
+      return false;
     }
   }
 
@@ -85,6 +101,20 @@ class VBotPhone {
   Future<void> mute() async {
     try {
       final _ = await _channel.invokeMethod(_methodMute);
+      return;
+    } catch (e) {
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+        ),
+      );
+      return;
+    }
+  }
+
+  Future<void> speaker() async {
+    try {
+      final _ = await _channel.invokeMapMethod(_methodDisconnect);
       return;
     } catch (e) {
       scaffoldMessengerKey.currentState?.showSnackBar(
