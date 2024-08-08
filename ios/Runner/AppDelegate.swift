@@ -13,10 +13,12 @@ enum ChannelName {
 
 enum Methods: String {
     case CONNECT = "connect"
+    case DISCONNECT = "disconnect"
     case STARTCALL = "startCall"
     case GETHOTLINE = "getHotlines"
     case HANGUP = "hangup"
     case MUTE = "mute"
+    case SPEAKER = "speaker"
 }
 
 @UIApplicationMain
@@ -56,6 +58,8 @@ enum Methods: String {
         switch mode {
         case .CONNECT:
             self.connect(call, result)
+        case .DISCONNECT:
+            self.disconnect(call, result)
         case .STARTCALL:
             self.startCall(call, result)
         case .GETHOTLINE:
@@ -64,6 +68,8 @@ enum Methods: String {
             self.hangup(call, result)
         case .MUTE:
             self.mute(call, result)
+        case .SPEAKER:
+            self.speaker(call, result)
         default:
             result(FlutterMethodNotImplemented)
             return
@@ -81,6 +87,17 @@ enum Methods: String {
             }
             
             result(["displayName": displayName])
+        }
+    }
+    
+    func disconnect(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        self.client.disconnect { error in
+            if let error = error as NSError? {
+                result(FlutterError(code: "\(error.code)", message: error.localizedDescription, details: nil))
+                return
+            }
+            
+            result(["disconnect": true])
         }
     }
     
@@ -135,6 +152,11 @@ enum Methods: String {
                 return
             }
         }
+    }
+    
+    func speaker(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        self.client.onOffSpeaker()
+        
     }
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {

@@ -114,7 +114,7 @@ class VBotPhone {
 
   Future<void> speaker() async {
     try {
-      final _ = await _channel.invokeMapMethod(_methodDisconnect);
+      final _ = await _channel.invokeMapMethod(_methodSpeaker);
       return;
     } catch (e) {
       scaffoldMessengerKey.currentState?.showSnackBar(
