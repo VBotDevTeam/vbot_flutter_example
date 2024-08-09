@@ -21,7 +21,7 @@ class CallActivity : AppCompatActivity() {
         }
 
         findViewById<ImageView>(R.id.btnAcceptCall).setOnClickListener {
-            MainActivity.client.answerIncomingCall()
+            MainActivity.client.answerCall()
             finish()
         }
     }

@@ -62,8 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    tokenController.text =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU2Ny0xNTYtMTk3In0.cy4pzmqY-Lc22qQhUsQ6tMQ6bEYBh5yZ4DrM9di8qWA';
   }
 
   void _connect() async {
@@ -82,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final result = await phone.connect(tokenController.text);
 
       displayName = result ?? "Error";
+      print("displayname = $displayName");
       isConnected = true;
       var hotlines = await phone.getHotlines();
       if (hotlines != null) {
