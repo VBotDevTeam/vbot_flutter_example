@@ -62,6 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    tokenController.text =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU2OS0xNTctMjM1In0.E69BgDIM1qEm5GRXeyAsRuN692al_4Vj_I895VV65XE";
   }
 
   void _connect() async {

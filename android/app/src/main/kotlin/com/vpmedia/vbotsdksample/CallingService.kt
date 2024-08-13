@@ -9,10 +9,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 
+class Notifiable(val notificationId: Int) {
+    var remoteAddress: String? = null
+}
+
 class CallingService : Service() {
+
+    private lateinit var notifiable: Notifiable
+
     companion object {
         const val CHANNEL_ID = "Calling channel id"
     }
@@ -22,8 +30,9 @@ class CallingService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d("CallingService", "onStartCommand")
         showIncomingCallPopup()
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     @SuppressLint("RemoteViewLayout")
@@ -36,7 +45,9 @@ class CallingService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val incomingCallIntent = Intent(applicationContext, CallActivity::class.java)
-        incomingCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        incomingCallIntent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_TASK_ON_HOME or Intent.FLAG_ACTIVITY_CLEAR_TOP
+
         val incomingCallPendingIntent = PendingIntent.getActivity(
             applicationContext,
             0,
@@ -82,8 +93,10 @@ class CallingService : Service() {
             val name = "Incoming call"
             val important = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, name, important)
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            channel.enableVibration(true)
+            channel.enableLights(true)
+            channel.setShowBadge(true)
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
