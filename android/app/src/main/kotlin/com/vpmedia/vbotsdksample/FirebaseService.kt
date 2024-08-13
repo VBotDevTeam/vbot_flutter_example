@@ -80,12 +80,7 @@ class FirebaseService : FirebaseMessagingService() {
         val notificationBuilder: NotificationCompat.Builder =
             NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(
-                    BitmapFactory.decodeResource(
-                        resources,
-                        R.mipmap.ic_launcher
-                    )
-                )
+                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
@@ -97,11 +92,7 @@ class FirebaseService : FirebaseMessagingService() {
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "vbot-sdk",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
+            val channel = NotificationChannel(channelId, "vbot-sdk", NotificationManager.IMPORTANCE_DEFAULT)
             notificationManager.createNotificationChannel(channel)
         }
         notificationManager.notify(Random.nextInt(0, 9999), notificationBuilder.build())
@@ -109,7 +100,11 @@ class FirebaseService : FirebaseMessagingService() {
 
     private fun showIncomingCallPopup() {
         val intent = Intent(this, CallingService::class.java)
-        startService(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        }else{
+            startService(intent)
+        }
     }
 
 }

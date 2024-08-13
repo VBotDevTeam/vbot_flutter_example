@@ -177,6 +177,17 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         EventChannel(
             flutterEngine.dartExecutor.binaryMessenger, CALL_STATE_CHANNEL
         ).setStreamHandler(this)
+
+        if (hasPermission(this, Manifest.permission.RECORD_AUDIO) && hasPermission(this, Manifest.permission.READ_PHONE_STATE)) {
+            Log.d("VBotPhone", "PERMISSION_GRANTED")
+        } else {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_PHONE_STATE
+                ), 1
+            )
+        }
     }
 
     private fun getTokenFirebase() {
