@@ -3,8 +3,6 @@ import MediaPlayer
 import UIKit
 import VBotPhoneSDK
 import VBotSIP
-import Starscream
-import KeychainSwift
 
 enum ChannelName {
     static let VBOT_CHANNEL = "com.vpmedia.vbot-sdk/vbot_phone"
@@ -12,6 +10,8 @@ enum ChannelName {
 }
 
 enum Methods: String {
+    case ISUSERCONNECTED = "isUserConnected"
+    case USERDISPLAYNAME = "userDisplayName"
     case CONNECT = "connect"
     case DISCONNECT = "disconnect"
     case STARTCALL = "startCall"
@@ -25,7 +25,6 @@ enum Methods: String {
 @objc class AppDelegate: FlutterAppDelegate, FlutterStreamHandler {
     private var eventSink: FlutterEventSink?
     let client = VBotPhone.sharedInstance
-    fileprivate var connectDurationTimer: Timer?
    
     override func application(
         _ application: UIApplication,
@@ -56,6 +55,10 @@ enum Methods: String {
     func methodCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let mode = Methods(rawValue: call.method)
         switch mode {
+        case .ISUSERCONNECTED:
+            self.isUserConnected(call, result)
+        case .USERDISPLAYNAME:
+            self.userDisplayName(call, result)
         case .CONNECT:
             self.connect(call, result)
         case .DISCONNECT:
@@ -74,6 +77,16 @@ enum Methods: String {
             result(FlutterMethodNotImplemented)
             return
         }
+    }
+
+    func isUserConnected(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let isUserConnected = self.client.isUserConnected()
+        result(["isUserConnected": isUserConnected])
+    }
+    
+    func userDisplayName(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let userDisplayName = self.client.userDisplayName()
+        result(["userDisplayName": userDisplayName])
     }
     
     func connect(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
@@ -156,7 +169,6 @@ enum Methods: String {
     
     func speaker(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         self.client.onOffSpeaker()
-        
     }
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
@@ -169,26 +181,12 @@ enum Methods: String {
         return nil
     }
     
-    func startConnectDurationTimer() {
-        DispatchQueue.main.async {
-            if self.connectDurationTimer == nil || !self.connectDurationTimer!.isValid {
-                self.connectDurationTimer?.invalidate()
-                self.connectDurationTimer = nil
-                self.connectDurationTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.setupCall), userInfo: nil, repeats: true)
-            }
-        }
-    }
-    
     @objc func setupCall(_ cacheCall: VBotCall? = nil) {
-        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let cache = self.client.getActiveCall() ?? cacheCall
             guard let call = cache else { return }
             
-            if call.callState != .null && call.callState != .disconnected {
-                self.startConnectDurationTimer()
-            }
             self.updateEventOnCallState(call)
         }
     }
@@ -197,16 +195,8 @@ enum Methods: String {
         guard let eventSink = eventSink else {
             return
         }
-        
-        if call.callState == .disconnected {
-            self.handleCallEnd()
-        }
+       
         eventSink(CallSink(call, name: self.client.callName).toMap)
-    }
-    
-    private func handleCallEnd() {
-        self.connectDurationTimer?.invalidate()
-        self.connectDurationTimer = nil
     }
 }
 
@@ -236,19 +226,9 @@ extension AppDelegate {
         self.setupCall(call)
     }
     
-    @objc func errorDuringCallSetup(_ notification: NSNotification) {
-        guard let eventSink = eventSink else {
-            return
-        }
-        eventSink("callerror")
-    }
+    @objc func errorDuringCallSetup(_ notification: NSNotification) {}
     
-    @objc func directlyShowActiveCallController(_ notification: Notification) {
-        guard let eventSink = eventSink else {
-            return
-        }
-        eventSink("callaccepted")
-    }
+    @objc func directlyShowActiveCallController(_ notification: Notification) {}
 }
 
 extension AppDelegate {
@@ -298,16 +278,16 @@ extension Encodable {
 struct CallSink {
     let name: String
     let state: String
-    let duration: String
+    let isIncoming: Bool
     let isMute: Bool
     let onHold: Bool
     
     init(_ call: VBotCall, name: String) {
         self.name = name
         self.state = CallSink.getCallState(call.callState)
+        self.isIncoming = call.isIncoming
         self.isMute = call.muted
         self.onHold = call.onHold
-        self.duration = CallSink.dateComponentsFormatter.string(from: call.connectDuration) ?? ""
     }
     
     private static func getCallState(_ state: VBotCallState) -> String {
@@ -333,15 +313,12 @@ struct CallSink {
     }()
     
     var toMap: [String: Any] {
-            return [
-                "name": name,
-                "state": state,
-                "duration": duration,
-                "isMute": isMute,
-                "onHold": onHold
-            ]
-        }
-    
+        return [
+            "name": self.name,
+            "state": self.state,
+            "isIncoming": self.isIncoming,
+            "isMute": self.isMute,
+            "onHold": self.onHold
+        ]
+    }
 }
-
-

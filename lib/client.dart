@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vbot_flutter_demo/main.dart';
+import 'package:vbot_flutter_demo/home_page.dart';
+
+final client = VBotPhone();
 
 class VBotPhone {
+  final String _methodIsUserConnected = "isUserConnected";
+  final String _methodUserDisplayName = "userDisplayName";
   final String _methodConnect = "connect";
   final String _methodDisconnect = "disconnect";
   final String _methodStartCall = "startCall";
@@ -13,6 +19,36 @@ class VBotPhone {
 
   final MethodChannel _channel =
       const MethodChannel('com.vpmedia.vbot-sdk/vbot_phone');
+
+  Future<bool> isUserConnected() async {
+    try {
+      final result = await _channel.invokeMethod(_methodIsUserConnected);
+      final res = result as Map;
+      return res["isUserConnected"];
+    } catch (e) {
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+        ),
+      );
+      return false;
+    }
+  }
+
+  Future<String> userDisplayName() async {
+    try {
+      final result = await _channel.invokeMethod(_methodUserDisplayName);
+      final res = result as Map;
+      return res["userDisplayName"];
+    } catch (e) {
+      scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+        ),
+      );
+      return "";
+    }
+  }
 
   Future<String?> connect(String token) async {
     try {
@@ -137,32 +173,6 @@ class VBotHotline {
     return VBotHotline(
       name: map['name'],
       phoneNumber: map['phoneNumber'],
-    );
-  }
-}
-
-class VBotSink {
-  final String name;
-  final String state;
-  final String duration;
-  final bool isMute;
-  final bool onHold;
-
-  VBotSink({
-    required this.name,
-    required this.state,
-    required this.duration,
-    required this.isMute,
-    required this.onHold,
-  });
-
-  factory VBotSink.fromMap(Map<String, dynamic> map) {
-    return VBotSink(
-      name: map['name'],
-      state: map['state'],
-      duration: map['duration'],
-      isMute: map['isMute'],
-      onHold: map['onHold'],
     );
   }
 }

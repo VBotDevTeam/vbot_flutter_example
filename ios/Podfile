@@ -6,7 +6,6 @@ target 'Runner' do
   use_frameworks! :linkage => :static
   
   pod 'VBotPhoneSDK', :git => 'https://github.com/VBotDevTeam/VBotPhoneSDK.git'
-#  pod 'VBotSIP', :git => 'https://github.com/VBotDevTeam/VBotSIP.git'
   
   target 'RunnerTests' do
     inherit! :search_paths
