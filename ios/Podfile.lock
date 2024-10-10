@@ -2,11 +2,7 @@ PODS:
   - CocoaLumberjack (3.8.5):
     - CocoaLumberjack/Core (= 3.8.5)
   - CocoaLumberjack/Core (3.8.5)
-  - KeychainSwift (20.0.0)
-  - Starscream (4.0.6)
-  - VBotPhoneSDK (1.0.0):
-    - KeychainSwift (= 20.0)
-    - Starscream (= 4.0.6)
+  - VBotPhoneSDK (1.2.0):
     - VBotSIP (= 1.2.0)
   - VBotSIP (1.2.0):
     - CocoaLumberjack
@@ -19,8 +15,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - CocoaLumberjack
-    - KeychainSwift
-    - Starscream
     - VBotSIP
     - Vialer-pjsip-iOS
 
@@ -30,17 +24,15 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   VBotPhoneSDK:
-    :commit: d4cdb16d2c2f3e4df1a4aa07f5baa89ec629f396
+    :commit: f5607d21323c96886070732ac2838d917f629e4c
     :git: https://github.com/VBotDevTeam/VBotPhoneSDK.git
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
-  KeychainSwift: 0ce6a4d13f7228054d1a71bb1b500448fb2ab837
-  Starscream: fb2c4510bebf908c62bd383bcf05e673720e91fd
-  VBotPhoneSDK: 333a00826a3eae36cb228c6fdc620a92592a9e4c
+  VBotPhoneSDK: 021495fd767a55a7823c4802c934afb45bf447a2
   VBotSIP: de2639f1e450fe46b9fa58118cafd4e6d292be83
   Vialer-pjsip-iOS: 5ceea9f0e46a7748b2542ba04ca7dacf4de4b51c
 
-PODFILE CHECKSUM: 37f11d820500b2a859eab40d856d8ba1a9aa55f9
+PODFILE CHECKSUM: e8695de34a7e2360bed2bc0d65c7898090cdf53f
 
 COCOAPODS: 1.15.2

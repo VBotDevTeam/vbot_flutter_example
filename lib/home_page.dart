@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:vbot_flutter_demo/call_screen.dart';
 import 'package:vbot_flutter_demo/call_state_manager.dart';
@@ -52,20 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: scaffoldMessengerKey,
-      child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Scaffold(
-          appBar: AppBar(title: Text(title)),
-          body: const SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  ConnectViewWidget(),
-                ],
-              ),
+      child: Scaffold(
+        appBar: AppBar(title: Text(title)),
+        body: const SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                ConnectViewWidget(),
+              ],
             ),
           ),
         ),
@@ -102,6 +99,9 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     super.initState();
 
     _checkConnect();
+
+    tokenController.text =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU2Ny0xNTYtMjU3In0.tLdNNKfBZLr8MYEDDxfYORIsmbT9FUtiLgGDDetS3yg';
   }
 
   void _checkConnect() async {
@@ -117,14 +117,15 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     }
   }
 
+  // Hàm kết nối
   void _connect() async {
     setState(() {
-      isLoading = true;
+      isLoading = true; // Hiển thị loading
     });
 
     if (tokenController.text.isEmpty) {
       setState(() {
-        isLoading = false;
+        isLoading = false; // Ẩn loading
       });
       return;
     }
@@ -147,7 +148,7 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
       }
     } finally {
       setState(() {
-        isLoading = false;
+        isLoading = false; // Ẩn loading
       });
     }
   }
@@ -162,9 +163,10 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     }
   }
 
+  // Hàm ngắt kết nối
   void _disconnect() async {
     setState(() {
-      isLoading = true;
+      isLoading = true; // Hiển thị loading
     });
 
     try {
@@ -179,19 +181,19 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
       }
     } finally {
       setState(() {
-        isLoading = false;
+        isLoading = false; // Ẩn loading
       });
     }
   }
 
   void _call() async {
     setState(() {
-      isCalling = true;
+      isCalling = true; // Show loading indicator
     });
 
     if (phoneController.text.isEmpty) {
       setState(() {
-        isCalling = false;
+        isCalling = false; // Hide loading indicator
       });
       return;
     }
@@ -205,7 +207,7 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
       print("call exception: $e");
     } finally {
       setState(() {
-        isCalling = false;
+        isCalling = false; // Hide loading indicator
       });
     }
   }
