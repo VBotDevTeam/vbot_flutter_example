@@ -12,7 +12,6 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.vpmedia.vbotsdksample.MainActivity.Companion.nameCall
 import kotlin.random.Random
 
 
@@ -36,23 +35,16 @@ class FirebaseService : FirebaseMessagingService() {
             try {
                 when (type) {
                     "3" -> {
-                        val offCall = hashMap["offCall"]
-                        val transId = hashMap["transId"].toString()
-                        val hotlineName = hashMap["hotlineName"].toString()
-                        val name = hashMap["name"].toString()
-                        if (offCall != null) {
-                            if (offCall == "0") {
-                                //call incoming
-                                if (MainActivity.clientExists()) {
-                                    MainActivity.client.addIncomingCall(transId)
-                                }
-                                nameCall = name
-                                showIncomingCallPopup()
-                            } else if (offCall == "1") {
-                                //end call
-                                if (MainActivity.clientExists()) {
-                                    MainActivity.client.endCall()
-                                }
+                        val offCall = hashMap["offCall"].toString()
+                        if (offCall == "0") {
+                            MyApplication.initCallManager(this, hashMap)
+                            MyApplication.callManager.incomingCall()
+                        } else {
+                            try {
+                                if (MyApplication.clientExists())
+                                    MyApplication.client.notificationCall(map = hashMap)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
                         }
                     }

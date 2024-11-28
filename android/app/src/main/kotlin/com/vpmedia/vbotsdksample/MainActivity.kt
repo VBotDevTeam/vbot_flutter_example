@@ -30,6 +30,8 @@ object ChannelName {
 }
 
 enum class Methods(val value: String) {
+    ISUSERCONNECTED("isUserConnected"),
+    USERDISPLAYNAME("userDisplayName"),
     CONNECT("connect"),
     DISCONNECT("disconnect"),
     STARTCALL("startCall"),
@@ -209,6 +211,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         resultWrapper = ResultWrapper(result)
         when (call.method) {
+            Methods.ISUSERCONNECTED.value -> isUserConnected(call, result)
+            Methods.USERDISPLAYNAME.value -> userDisplayName(call, result)
             Methods.CONNECT.value -> connect(call, result)
             Methods.DISCONNECT.value -> disconnect(call, result)
             Methods.STARTCALL.value -> startCall(call, result)
@@ -220,6 +224,18 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             Methods.HOLD.value -> holdCall(call, result)
             else -> result.notImplemented()
         }
+    }
+
+    private fun isUserConnected(call: MethodCall, result: MethodChannel.Result) {
+        if (client.getStateAccount() == AccountRegistrationState.Ok) {
+            result.success(true)
+        }
+        result.success(false)
+    }
+
+    private fun userDisplayName(call: MethodCall, result: MethodChannel.Result) {
+        val displayName = client.getAccountUsername();
+        result.success(displayName)
     }
 
     private fun connect(call: MethodCall, result: MethodChannel.Result) {
