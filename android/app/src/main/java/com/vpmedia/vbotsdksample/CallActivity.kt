@@ -33,15 +33,15 @@ class CallActivity : AppCompatActivity() {
     private fun registerViewsEvent() {
         findViewById<ImageView>(R.id.btnRejectCall).setOnClickListener {
             MainActivity.client.declineIncomingCall(true)
-            val callingService = Intent(this, CallingService::class.java)
-            stopService(callingService)
+//            val callingService = Intent(this, CallingService::class.java)
+//            stopService(callingService)
             finish()
         }
 
         findViewById<ImageView>(R.id.btnAcceptCall).setOnClickListener {
             MainActivity.client.answerCall()
-            val i = Intent(this, CallingService::class.java)
-            stopService(i)
+//            val i = Intent(this, CallingService::class.java)
+//            stopService(i)
             finish()
         }
     }

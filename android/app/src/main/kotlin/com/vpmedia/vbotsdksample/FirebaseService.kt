@@ -37,12 +37,12 @@ class FirebaseService : FirebaseMessagingService() {
                     "3" -> {
                         val offCall = hashMap["offCall"].toString()
                         if (offCall == "0") {
-                            MyApplication.initCallManager(this, hashMap)
-                            MyApplication.callManager.incomingCall()
+                            MainActivity.initCallManager(this, hashMap)
+                            MainActivity.callManager.incomingCall()
                         } else {
                             try {
-                                if (MyApplication.clientExists())
-                                    MyApplication.client.notificationCall(map = hashMap)
+                                if (MainActivity.clientExists())
+                                    MainActivity.client.notificationCall(map = hashMap)
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
@@ -90,14 +90,14 @@ class FirebaseService : FirebaseMessagingService() {
         notificationManager.notify(Random.nextInt(0, 9999), notificationBuilder.build())
     }
 
-    private fun showIncomingCallPopup() {
-        val intent = Intent(this, CallingService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        }else{
-            startService(intent)
-        }
-    }
+//    private fun showIncomingCallPopup() {
+//        val intent = Intent(this, CallingService::class.java)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(intent)
+//        }else{
+//            startService(intent)
+//        }
+//    }
 
 }
 

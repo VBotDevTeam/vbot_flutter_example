@@ -103,6 +103,8 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
   void initState() {
     super.initState();
 
+    tokenController.text =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNTI1Ny0yNTctMzE4In0._fnprtmfUdFel8zrGLhbUVlnyHfTp_0fk_ImkjL2WbI";
     _checkConnect();
 
     tokenController.text =
