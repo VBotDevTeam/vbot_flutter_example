@@ -58,11 +58,34 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
     companion object {
         lateinit var client: VBotClient
+        lateinit var callManager: CallManager
 
         var events: EventChannel.EventSink? = null
         var nameCall = ""
+
         fun clientExists(): Boolean {
             return ::client.isInitialized
+        }
+
+        //Khởi tạo VBotClient
+        fun initClient(context: Context) {
+            if (clientExists() && client.isSetup()) {
+                android.util.Log.d("LogApp", "Skipping Client creation")
+                return
+            }
+            android.util.Log.d("LogApp", "startClient")
+            client = VBotClient(context)
+        }
+
+        fun initCallManager(context: Context, hashMap: HashMap<String, String>) {
+            if (callManagerExists()) {
+                return
+            }
+            callManager = CallManager(context, hashMap)
+        }
+
+        fun callManagerExists(): Boolean {
+            return ::callManager.isInitialized
         }
     }
 
@@ -167,7 +190,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        client = VBotClient(context)
+        initClient(context)
         client.addListener(listener)
         client.setup()
         getTokenFirebase()
@@ -185,8 +208,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         } else {
             requestPermissions(
                 arrayOf(
-                    Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.READ_PHONE_STATE
+                    Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE
                 ), 1
             )
         }
