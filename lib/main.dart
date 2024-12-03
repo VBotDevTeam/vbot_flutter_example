@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vbot_flutter_demo/call_state_manager.dart';
+import 'package:vbot_flutter_demo/client.dart';
 import 'package:vbot_flutter_demo/home_page.dart';
+import 'package:vbot_flutter_demo/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,9 +19,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  ValueNotifier<bool> isUserConnected = ValueNotifier<bool>(false);
   @override
   void initState() {
     super.initState();
+
+    _checkConnect();
+  }
+
+  void _checkConnect() async {
+    bool result = await client.isUserConnected();
+    isUserConnected.value = result;
   }
 
   @override
@@ -36,7 +46,16 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'VBot Phone Example'),
+      home: ValueListenableBuilder<bool>(
+        valueListenable: isUserConnected,
+        builder: (BuildContext context, bool value, child) {
+          if (value) {
+            return const MyHomePage(title: 'VBot Phone Example');
+          } else {
+            return const LoginPage();
+          }
+        },
+      ),
     );
   }
 }

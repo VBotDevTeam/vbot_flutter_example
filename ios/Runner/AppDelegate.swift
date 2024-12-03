@@ -292,8 +292,11 @@ struct CallSink {
     
     private static func getCallState(_ state: VBotCallState) -> String {
         switch state {
-        case .calling, .early:
+        case .calling:
             return "calling"
+            
+        case .early:
+            return "early"
         case .incoming:
             return "incoming"
         case .connecting:

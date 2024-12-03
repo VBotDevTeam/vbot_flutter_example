@@ -2,7 +2,7 @@ PODS:
   - CocoaLumberjack (3.8.5):
     - CocoaLumberjack/Core (= 3.8.5)
   - CocoaLumberjack/Core (3.8.5)
-  - VBotPhoneSDK (1.4.0):
+  - VBotPhoneSDK (1.5.0):
     - VBotSIP (= 1.2.0)
   - VBotSIP (1.2.0):
     - CocoaLumberjack
@@ -24,12 +24,12 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   VBotPhoneSDK:
-    :commit: 711e382080ebf7a3c0c879dd3583492a8a5108e9
+    :commit: fbef0e585b0f01e590b60f04d028105e41147437
     :git: https://github.com/VBotDevTeam/VBotPhoneSDK.git
 
 SPEC CHECKSUMS:
   CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
-  VBotPhoneSDK: 8287831320b411ef823c6800090d8dad92b1839d
+  VBotPhoneSDK: e35cc0095a1bc3d88f3c019135178619551a1a9f
   VBotSIP: de2639f1e450fe46b9fa58118cafd4e6d292be83
   Vialer-pjsip-iOS: 5ceea9f0e46a7748b2542ba04ca7dacf4de4b51c
 

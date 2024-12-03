@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vbot_flutter_demo/call_screen.dart';
 import 'package:vbot_flutter_demo/call_state_manager.dart';
 import 'package:vbot_flutter_demo/client.dart';
+import 'package:vbot_flutter_demo/login_page.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -24,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     CallStateManager().callStateStream.listen(
       (vbotSink) {
+        print(vbotSink);
         if (vbotSink.state == 'connecting' && vbotSink.isIncoming) {
           Navigator.push(
             context,
@@ -170,12 +172,10 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     try {
       final isDisconnected = await client.disconnect();
       if (isDisconnected) {
-        setState(() {
-          isConnected = false;
-          hotlines = [];
-          selectedHotline = null;
-          displayName = "";
-        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
       }
     } finally {
       setState(() {
