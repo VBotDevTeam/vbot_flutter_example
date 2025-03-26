@@ -1,0 +1,26 @@
+
+platform :ios, '13.5'
+source "https://github.com/CocoaPods/Specs.git"
+
+target 'Runner' do
+  use_frameworks!
+  
+  pod 'VBotPhoneSDKiOS-Public', '1.0.1'
+  
+  target 'RunnerTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    if target.name == 'Starscream'
+      target.build_configurations.each do |config|
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+    end
+  end
+end
+
