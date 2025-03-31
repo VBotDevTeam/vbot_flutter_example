@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:vbot_flutter_demo/call_screen.dart';
 import 'package:vbot_flutter_demo/call_state_manager.dart';
@@ -103,11 +101,7 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
   void initState() {
     super.initState();
 
-    tokenController.text =
-        "";
     _checkConnect();
-
-   
   }
 
   void _checkConnect() async {
@@ -123,15 +117,14 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     }
   }
 
-  // Hàm kết nối
   void _connect() async {
     setState(() {
-      isLoading = true; // Hiển thị loading
+      isLoading = true;
     });
 
     if (tokenController.text.isEmpty) {
       setState(() {
-        isLoading = false; // Ẩn loading
+        isLoading = false;
       });
       return;
     }
@@ -154,7 +147,7 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
       }
     } finally {
       setState(() {
-        isLoading = false; // Ẩn loading
+        isLoading = false;
       });
     }
   }
@@ -169,10 +162,9 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     }
   }
 
-  // Hàm ngắt kết nối
   void _disconnect() async {
     setState(() {
-      isLoading = true; // Hiển thị loading
+      isLoading = true;
     });
 
     try {
@@ -187,19 +179,19 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
       }
     } finally {
       setState(() {
-        isLoading = false; // Ẩn loading
+        isLoading = false;
       });
     }
   }
 
   void _call() async {
     setState(() {
-      isCalling = true; // Show loading indicator
+      isCalling = true;
     });
 
     if (phoneController.text.isEmpty) {
       setState(() {
-        isCalling = false; // Hide loading indicator
+        isCalling = false;
       });
       return;
     }
@@ -213,7 +205,7 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
       print("call exception: $e");
     } finally {
       setState(() {
-        isCalling = false; // Hide loading indicator
+        isCalling = false;
       });
     }
   }
