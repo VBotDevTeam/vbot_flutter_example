@@ -1,8 +1,7 @@
 import Flutter
 import MediaPlayer
 import UIKit
-import VBotPhoneSDK
-import VBotSIP
+import VBotPhonePublic
 
 enum ChannelName {
     static let VBOT_CHANNEL = "com.vpmedia.vbot-sdk/vbot_phone"
@@ -32,10 +31,13 @@ enum Methods: String {
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
       
-        self.client.setup()
+        let config = VBotConfig(
+            iconTemplateImageData: UIImage(named: "callkit-icon")?.pngData()
+        )
         
-        setupObservers()
-
+        VBotPhone.sharedInstance.setup(with: config)
+        VBotPhone.sharedInstance.addDelegate(self)
+        
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
         
         let vbotChannel = FlutterMethodChannel(name: ChannelName.VBOT_CHANNEL, binaryMessenger: controller.binaryMessenger)
@@ -48,9 +50,7 @@ enum Methods: String {
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    override func applicationWillTerminate(_ application: UIApplication) {
-        removeObservers()
-    }
+    override func applicationWillTerminate(_ application: UIApplication) {}
     
     func methodCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let mode = Methods(rawValue: call.method)
@@ -118,24 +118,24 @@ enum Methods: String {
         let phoneNumber = ((call.arguments as? [String: Any])?["phoneNumber"] as? String ?? "")
         let hotline = ((call.arguments as? [String: Any])?["hotline"] as? String ?? "")
         
-        checkMicrophonePermission { startCalling in
-            if startCalling {
-                self.client.startCall(hotline: hotline, phoneNumber: phoneNumber) { error in
-                        
-                    if let error = error as NSError? {
-                        result(FlutterError(code: "\(error.code)", message: error.localizedDescription, details: nil))
-                        return
-                    }
-                    
-                    result(["phoneNumber": phoneNumber])
+        self.client.startOutgoingCall(name: "Cá Ngừ Admin", hotline: "", number: "0") { [weak self] resultAPI in
+            guard let self = self else { return }
+            switch resultAPI {
+            case .success():
+                result(["phoneNumber": phoneNumber])
+            case .failure(let error):
+                
+                if let error = error as NSError? {
+                    result(FlutterError(code: "\(error.code)", message: error.localizedDescription, details: nil))
                 }
-            } else {
-                self.presentEnableMicrophoneAlert()
+                                
+                return
             }
         }
     }
     
     func getHotlines(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        
         self.client.getHotlines { hotlines, error in
             if let error = error as NSError? {
                 result(FlutterError(code: "\(error.code)", message: error.localizedDescription, details: nil))
@@ -159,12 +159,13 @@ enum Methods: String {
     }
     
     func mute(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
-        self.client.muteCall { error in
-            if let error = error as NSError? {
-                result(FlutterError(code: "\(error.code)", message: error.localizedDescription, details: nil))
-                return
-            }
-        }
+        self.client.muteCall()
+//        self.client.muteCall { error in
+//            if let error = error as NSError? {
+//                result(FlutterError(code: "\(error.code)", message: error.localizedDescription, details: nil))
+//                return
+//            }
+//        }
     }
     
     func speaker(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
@@ -180,89 +181,22 @@ enum Methods: String {
         self.eventSink = nil
         return nil
     }
-    
-    @objc func setupCall(_ cacheCall: VBotCall? = nil) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            let cache = self.client.getActiveCall() ?? cacheCall
-            guard let call = cache else { return }
-            
-            self.updateEventOnCallState(call)
-        }
-    }
-    
-    private func updateEventOnCallState(_ call: VBotCall) {
+}
+
+extension AppDelegate: VBotPhoneDelegate {
+    func callStateChanged(state: VBotCallState) {
         guard let eventSink = eventSink else {
             return
         }
-       
-        eventSink(CallSink(call, name: self.client.callName).toMap)
-    }
-}
-
-extension AppDelegate {
-    /// Hook up the observers that AppDelegate should listen to
-    fileprivate func setupObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.callStateChanged(_:)), name: NSNotification.Name.VBotCallStateChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.errorDuringCallSetup(_:)), name: Notification.Name.VBotCallErrorDuringSetupCall, object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.directlyShowActiveCallController(_:)),
-                                               name: Notification.Name.CallKitProviderDelegateInboundCallAccepted,
-                                               object: nil)
+        eventSink(CallSink(state, name: self.client.getCallName()).toMap)
     }
     
-    fileprivate func removeObservers() {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.VBotCallStateChanged, object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.VBotCallErrorDuringSetupCall, object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.CallKitProviderDelegateInboundCallAccepted, object: nil)
-    }
-    
-    @objc fileprivate func callStateChanged(_ notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let call = userInfo[VBotNotificationUserInfoCallKey] as? VBotCall
-        else {
+    func callMuteStateDidChange(muted: Bool) {
+        guard let eventSink = eventSink else {
             return
         }
-        self.setupCall(call)
-    }
-    
-    @objc func errorDuringCallSetup(_ notification: NSNotification) {}
-    
-    @objc func directlyShowActiveCallController(_ notification: Notification) {}
-}
-
-extension AppDelegate {
-    func checkMicrophonePermission(completion: @escaping ((_ startCalling: Bool) -> Void)) {
-        AVAudioSession.sharedInstance().requestRecordPermission { granted in
-            if granted {
-                completion(true)
-            } else {
-                completion(false)
-            }
-        }
-    }
-    
-    /// Show a notification that makes it possible to open the settings and enable the microphone
-    ///
-    /// Activating the microphone permission will terminate the app.
-    func presentEnableMicrophoneAlert() {
-        let alertController = UIAlertController(title: NSLocalizedString("Access to microphone denied", comment: "Access to microphone denied"),
-                                                message: NSLocalizedString("Give permission to use your microphone.\nGo to",
-                                                                           comment: "Give permission to use your microphone.\nGo to"),
-                                                preferredStyle: .alert)
-        
-        // Cancel the call, without audio, calling isn't possible.
-        let noAction = UIAlertAction(title: NSLocalizedString("Cancel call", comment: "Cancel call"), style: .cancel) { _ in
-        }
-        alertController.addAction(noAction)
-        
-        // User wants to open the settings to enable microphone permission.
-        let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: "Settings"), style: .default) { _ in
-            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-        }
-        alertController.addAction(settingsAction)
-        let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
-        controller.present(alertController, animated: true, completion: nil)
+        let callState = VBotPhone.sharedInstance.getCallState()
+        eventSink(CallSink(callState, name: self.client.getCallName()).toMap)
     }
 }
 
@@ -282,12 +216,12 @@ struct CallSink {
     let isMute: Bool
     let onHold: Bool
     
-    init(_ call: VBotCall, name: String) {
+    init(_ callState: VBotCallState, name: String) {
         self.name = name
-        self.state = CallSink.getCallState(call.callState)
-        self.isIncoming = call.isIncoming
-        self.isMute = call.muted
-        self.onHold = call.onHold
+        self.state = CallSink.getCallState(callState)
+        self.isIncoming = VBotPhone.sharedInstance.isIncomingCall()
+        self.isMute = VBotPhone.sharedInstance.isCallMute()
+        self.onHold = VBotPhone.sharedInstance.isCallHold()
     }
     
     private static func getCallState(_ state: VBotCallState) -> String {
