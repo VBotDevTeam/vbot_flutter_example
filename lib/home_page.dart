@@ -104,11 +104,10 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     super.initState();
 
     tokenController.text =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNTI1Ny0yNTctMzE4In0._fnprtmfUdFel8zrGLhbUVlnyHfTp_0fk_ImkjL2WbI";
+        "";
     _checkConnect();
 
-    tokenController.text =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjU0ODctNDU2Ny0xNTYtMjU3In0.tLdNNKfBZLr8MYEDDxfYORIsmbT9FUtiLgGDDetS3yg';
+   
   }
 
   void _checkConnect() async {
