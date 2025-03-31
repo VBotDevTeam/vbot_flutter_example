@@ -1,0 +1,30 @@
+PODS:
+  - CocoaLumberjack (3.8.5):
+    - CocoaLumberjack/Core (= 3.8.5)
+  - CocoaLumberjack/Core (3.8.5)
+  - Reachability (3.7.6)
+  - Starscream (4.0.8)
+  - VBotPhoneSDKiOS-Public (1.0.1):
+    - CocoaLumberjack (~> 3.8.5)
+    - Reachability (~> 3.7.6)
+    - Starscream (~> 4.0.8)
+
+DEPENDENCIES:
+  - VBotPhoneSDKiOS-Public (= 1.0.1)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - CocoaLumberjack
+    - Reachability
+    - Starscream
+    - VBotPhoneSDKiOS-Public
+
+SPEC CHECKSUMS:
+  CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
+  Reachability: fd0ecd23705e2599e4cceeb943222ae02296cbc6
+  Starscream: 19b5533ddb925208db698f0ac508a100b884a1b9
+  VBotPhoneSDKiOS-Public: 5fe53a5587ef0a102c9ecfa7c9f836649d199c68
+
+PODFILE CHECKSUM: 97576e675e4922f9cee2c0fad4bfc12b764eb03b
+
+COCOAPODS: 1.16.2
