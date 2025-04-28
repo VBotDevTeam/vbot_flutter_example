@@ -13,7 +13,7 @@ Mở **podfile** trong thư mục iOS và thực hiện các thay đổi sau:
 - Thêm pod của VBot SDK:
 
 ```swift
-pod 'VBotPhoneSDKiOS-Public', '1.0.2'
+pod 'VBotPhoneSDKiOS-Public', '1.0.3'
 ```
 
 - Thêm build settings config:
@@ -77,7 +77,17 @@ Mở app/build.gradle thêm VBot SDK
 
 ```kotlin
 dependencies {
-+		implementation 'com.github.VBotDevTeam:VBot_SDK_Android:1.0.1'
+		//các thư viện cần thiết để SDK hoạt động
++		implementation("io.reactivex.rxjava2:rxjava:2.2.21")
++		implementation("com.google.code.gson:gson:2.11.0")
++		implementation("com.squareup.retrofit2:adapter-rxjava2:2.11.0")
++		implementation("com.squareup.retrofit2:converter-gson:2.11.0")
++		implementation("com.squareup.retrofit2:retrofit:2.11.0")
++		implementation("org.reactivestreams:reactive-streams:1.0.4")
++		implementation ("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
++		implementation("com.jakewharton.timber:timber:5.0.1")
++		implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.0")
++		implementation 'com.github.VBotDevTeam:VBotPhoneSDKAndroid-Public:1.0.7'
 }
 ```
 
