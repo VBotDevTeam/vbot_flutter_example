@@ -13,7 +13,7 @@ Mở **podfile** trong thư mục iOS và thực hiện các thay đổi sau:
 - Thêm pod của VBot SDK:
 
 ```swift
-pod 'VBotPhoneSDKiOS-Public', '1.0.3'
+pod 'VBotPhoneSDKiOS-Public', '1.1.0'
 ```
 
 - Thêm build settings config:
@@ -37,7 +37,7 @@ platform :ios, '13.5'
 target 'Runner' do
   use_frameworks! :linkage => :static
 
-  pod 'VBotPhoneSDKiOS-Public', '1.0.1'
+  pod 'VBotPhoneSDKiOS-Public', '1.1.0'
 
   target 'RunnerTests' do
     inherit! :search_paths
