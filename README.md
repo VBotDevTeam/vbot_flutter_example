@@ -87,7 +87,7 @@ dependencies {
 +		implementation ("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
 +		implementation("com.jakewharton.timber:timber:5.0.1")
 +		implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.0")
-+		implementation 'com.github.VBotDevTeam:VBotPhoneSDKAndroid-Public:1.0.7'
++		implementation 'com.github.VBotDevTeam:VBotPhoneSDKAndroid-Public:1.0.9'
 }
 ```
 
