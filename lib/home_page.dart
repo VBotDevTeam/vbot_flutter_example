@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vbot_flutter_demo/call_screen.dart';
 import 'package:vbot_flutter_demo/vbot_phone_manager.dart';
-import 'dart:async';
-
-import 'package:vbot_flutter_demo/sink.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -21,7 +18,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final vbotManager = VBotPhoneManager();
   String get title => widget.title;
   bool _isCallPagePushed = false;
-  late StreamSubscription<VBotSink> _callSubscription;
 
   @override
   void initState() {
@@ -34,8 +30,10 @@ class _MyHomePageState extends State<MyHomePage> {
             if (_isCallPagePushed || !mounted) return;
             final isIncomingConfirmed =
                 sink.state == 'confirmed' && sink.isIncoming;
+
             final isOutgoingCalling =
                 sink.state == 'calling' && !sink.isIncoming;
+
             if (isIncomingConfirmed || isOutgoingCalling) {
               _isCallPagePushed = true;
               Navigator.push(
@@ -55,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    _callSubscription.cancel();
     vbotManager.dispose();
     super.dispose();
   }

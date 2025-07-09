@@ -40,6 +40,7 @@ enum class Methods(val value: String) {
     DISCONNECT("disconnect"),
     STARTCALL("startCall"),
     GETHOTLINE("getHotlines"),
+    ANSWER("answer"),
     HANGUP("hangup"),
     MUTE("mute"),
     SPEAKER("speaker"),
@@ -54,7 +55,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     private var tokenFirebase: String = ""
     private var resultWrapper: ResultWrapper? = null
 
-    private var isMic = true
+    private var isMute = false
     private var isSpeaker = true
     private var onHold = false
     private var typeCall = ""
@@ -68,6 +69,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
         var events: EventChannel.EventSink? = null
         var nameCall = ""
+        var isIncoming = false
 
         fun clientExists(): Boolean {
             return ::client.isInitialized
@@ -93,21 +95,6 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         }
     }
 
-    private var runnable: Runnable = object : Runnable {
-        override fun run() {
-            val callSink = CallSink(
-                nameCall,
-                typeCall,
-                "",
-                isMic,
-                onHold
-            )
-            events?.success(callSink.toMap())
-            handler.postDelayed(this, 1000)
-
-        }
-    }
-
     private var listener = object : VBotListener() {
         //Lắng nghe trạng thái Account register
         override fun onConnectState(state: ConnectState, reason: String) {
@@ -121,7 +108,6 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                         Log.d("VBotePhone", "error=$e")
                         return
                     }
-
                 }
 
                 ConnectState.ERROR -> {
@@ -152,38 +138,24 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         override fun onCallState(state: VBotCallState) {
             super.onCallState(state)
             runOnUiThread {
-                Log.d("VBotPhone", "state123: $state")
+                Log.d("VBotPhone", "callState: $state")
+                isIncoming = client.isIncomingCall()
                 val stateCall = when (state) {
-
-                    VBotCallState.CALLING, VBotCallState.EARLY -> {
-                        "calling"
-                    }
-
-                    VBotCallState.INCOMING -> {
-                        "incoming"
-                    }
-
-                    VBotCallState.CONNECTING -> {
-                        handler.postDelayed(runnable, 1000)
-                        "connecting"
-                    }
-
-                    VBotCallState.CONFIRMED -> {
-                        "confirmed"
-                    }
-
-                    else -> {
-                        handler.removeCallbacks(runnable, 1000)
-                        "disconnected"
-                    }
+                    VBotCallState.NONE -> "none"
+                    VBotCallState.CALLING, VBotCallState.EARLY -> "calling"
+                    VBotCallState.INCOMING -> "incoming"
+                    VBotCallState.CONNECTING -> "connecting"
+                    VBotCallState.CONFIRMED -> "confirmed"
+                    else ->  "disconnected"
                 }
+
                 typeCall = stateCall
 
                 val callSink = CallSink(
                     nameCall,
                     stateCall,
-                    "",
-                    isMic,
+                    isIncoming,
+                    isMute,
                     onHold
                 )
                 events?.success(callSink.toMap())
@@ -240,6 +212,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             Methods.DISCONNECT.value -> disconnect(call, result)
             Methods.STARTCALL.value -> startCall(call, result)
             Methods.GETHOTLINE.value -> getHotline(call, result)
+            Methods.ANSWER.value -> answer(call, result)
             Methods.HANGUP.value -> hangUp(call, result)
             Methods.MUTE.value -> mute(call, result)
             Methods.SPEAKER.value -> speaker(call, result)
@@ -308,8 +281,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     private fun mute(call: MethodCall, result: MethodChannel.Result) {
-        isMic = !isMic
-        client.muteCall(isMic)
+        isMute = !isMute
+        client.muteCall(isMute)
     }
 
     private fun speaker(call: MethodCall, result: MethodChannel.Result) {
@@ -345,6 +318,10 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         }
     }
 
+    private fun answer(call: MethodCall, result: MethodChannel.Result) {
+        client.answerCall()
+    }
+
     private fun hangUp(call: MethodCall, result: MethodChannel.Result) {
         client.endcall()
     }
@@ -366,7 +343,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 open class CallSink(
     var name: String,
     var state: String,
-    var duration: String,
+    var isIncoming: Boolean,
     var isMute: Boolean,
     var onHold: Boolean,
 ) {
@@ -374,12 +351,13 @@ open class CallSink(
         return mapOf(
             "name" to name,
             "state" to state,
-            "duration" to duration,
+            "isIncoming" to isIncoming,
             "isMute" to isMute,
             "onHold" to onHold,
         )
     }
 }
+
 
 class ResultWrapper(private var result: MethodChannel.Result?) {
     fun success(data: Any?) {

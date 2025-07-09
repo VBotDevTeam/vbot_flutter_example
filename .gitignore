@@ -44,3 +44,10 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+/android/caches
+/android/.tmp
+/android/wrapper
+/android/native
+/android/daemon
+/android/daemon
+/android/jdks

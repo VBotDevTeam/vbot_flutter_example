@@ -115,6 +115,14 @@ class VBotPhoneManager {
     }
   }
 
+  Future<void> answer() async {
+    try {
+      await _methodChannel.invokeMethod('answer');
+    } catch (e) {
+      _showError(e);
+    }
+  }
+
   Future<void> hangup() async {
     try {
       await _methodChannel.invokeMethod('hangup');

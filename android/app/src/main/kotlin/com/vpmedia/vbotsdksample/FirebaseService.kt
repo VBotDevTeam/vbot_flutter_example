@@ -24,23 +24,20 @@ class FirebaseService : FirebaseMessagingService() {
             hashMap[key] = remoteMessage.data[key].toString()
         }
         val type = hashMap["type"]
-        Log.d("VBotPhone", "data=$hashMap")
         if (remoteMessage.notification != null) {
             val title = remoteMessage.notification!!.title
             val message = remoteMessage.notification!!.body
-            Log.d("VBotPhone", "noti thường -- title=$title -- message=$message")
             sendNotification("$title", "$message")
         } else {
-            Log.d("VBotPhone", "noti data")
             try {
                 when (type) {
                     "3" -> {
                         val offCall = hashMap["offCall"].toString()
-
+                        val name = hashMap["name"].toString()
 
                         if (offCall == "0") {
                             MainActivity.initCallManager(this, hashMap)
-                            MainActivity.callManager.incomingCall()
+                            MainActivity.callManager.incomingCall(name)
                         } else {
                             try {
                                 if (MainActivity.clientExists())
@@ -74,7 +71,6 @@ class FirebaseService : FirebaseMessagingService() {
         val notificationBuilder: NotificationCompat.Builder =
             NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
