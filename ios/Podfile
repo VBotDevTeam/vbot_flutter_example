@@ -5,7 +5,7 @@ source "https://github.com/CocoaPods/Specs.git"
 target 'Runner' do
   use_frameworks!
   
-  pod 'VBotPhoneSDKiOS-Public', '1.0.5'  
+  pod 'VBotPhoneSDKiOS-Public', '1.1.0'
   
   target 'RunnerTests' do
     inherit! :search_paths

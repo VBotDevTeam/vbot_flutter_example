@@ -20,7 +20,7 @@ enum Methods: String {
     case SPEAKER = "speaker"
 }
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate, FlutterStreamHandler {
     private var eventSink: FlutterEventSink?
     let client = VBotPhone.sharedInstance
@@ -194,6 +194,11 @@ extension AppDelegate: VBotPhoneDelegate {
         }
         let callState = VBotPhone.sharedInstance.getCallState()
         eventSink(CallSink(callState, name: self.client.getCallName()).toMap)
+    }
+    
+    // Hàm trả về nguyên nhân kết thúc cuộc gọi
+    func callEnded(reason: VBotEndCallReason) {
+        print("callEnded reason: \(reason.description)")
     }
 }
 
