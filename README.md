@@ -13,7 +13,7 @@ Mở **podfile** trong thư mục iOS và thực hiện các thay đổi sau:
 - Thêm pod của VBot SDK:
 
 ```swift
-pod 'VBotPhoneSDKiOS-Public', '1.1.0'
+pod 'VBotPhoneSDKiOS-Public', '1.1.6'
 ```
 
 - Thêm build settings config:
