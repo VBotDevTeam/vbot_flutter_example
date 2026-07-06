@@ -6,23 +6,23 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 
-import com.vpmedia.vbotphonesdk.listener.VBotListener
-import com.vpmedia.vbotphonesdk.enum.VBotCallState
+import com.vpmedia.sdkvbot.client.ClientListener
+import com.vpmedia.sdkvbot.en.CallState
 
 class CallManager(val context: Context, val hashMap: HashMap<String, String>) {
 
-    private var listener = object : VBotListener() {
+    private var listener = object : ClientListener() {
 
 
-        override fun onCallState(state: VBotCallState) {
+        override fun onCallState(state: CallState) {
             super.onCallState(state)
 
             when (state) {
-                VBotCallState.INCOMING -> {
+                CallState.Incoming -> {
 
                 }
 
-                VBotCallState.CONNECTING, VBotCallState.CALLING -> {
+                CallState.Connecting, CallState.Calling, CallState.Early -> {
 
                     val hotlineName = hashMap["hotlineName"].toString()
                     val name = hashMap["name"].toString()
@@ -36,10 +36,10 @@ class CallManager(val context: Context, val hashMap: HashMap<String, String>) {
 
                 }
 
-                VBotCallState.CONFIRMED -> {
+                CallState.Confirmed -> {
                 }
 
-                VBotCallState.DISCONNECTED -> {
+                CallState.Disconnected -> {
 
                     MainActivity.client.removeListener(this)
                 }
@@ -54,8 +54,9 @@ class CallManager(val context: Context, val hashMap: HashMap<String, String>) {
         Handler(Looper.getMainLooper()).post {
             MainActivity.initClient(context)
             MainActivity.nameCall = name
+            MainActivity.isIncoming = true
             MainActivity.client.addListener(listener)
-            MainActivity.client.startIncomingCall(hashMap)
+            MainActivity.client.notificationCall(hashMap)
         }
     }
 }

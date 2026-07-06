@@ -8,10 +8,11 @@ import android.os.Handler
 import android.os.Looper
 import com.google.firebase.messaging.FirebaseMessaging
 
-import com.vpmedia.vbotphonesdk.listener.VBotListener
-import com.vpmedia.vbotphonesdk.VBotPhone
-import com.vpmedia.vbotphonesdk.enum.ConnectState
-import com.vpmedia.vbotphonesdk.enum.VBotCallState
+import com.vpmedia.sdkvbot.client.VBotClient
+import com.vpmedia.sdkvbot.client.VBotConfig
+import com.vpmedia.sdkvbot.client.ClientListener
+import com.vpmedia.sdkvbot.en.AccountRegistrationState
+import com.vpmedia.sdkvbot.en.CallState
 
 import com.vpmedia.vbotsdksample.ChannelName.CALL_STATE_CHANNEL
 import com.vpmedia.vbotsdksample.ChannelName.VBOT_CHANNEL
@@ -63,7 +64,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        lateinit var client: VBotPhone
+        lateinit var client: VBotClient
 
         lateinit var callManager: CallManager
 
@@ -75,7 +76,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             return ::client.isInitialized
         }
 
-        //Khởi tạo VBotPhone
+        //Khởi tạo VBotClient
 
         fun initClient(context: Context) {
             if (clientExists()) {
@@ -83,7 +84,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                 return
             }
             Log.d("MainActivity", "startClient")
-            client = VBotPhone.setup(context)
+            client = VBotClient(context)
+            client.setup() // Khởi tạo với cấu hình mặc định
         }
 
         fun initCallManager(context: Context, hashMap: HashMap<String, String>) {
@@ -95,22 +97,22 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         }
     }
 
-    private var listener = object : VBotListener() {
+    private var listener = object : ClientListener() {
         //Lắng nghe trạng thái Account register
-        override fun onConnectState(state: ConnectState, reason: String) {
-            Log.d("VBotPhone", "state=$state")
-            when (state) {
-                ConnectState.OK -> {
+        override fun onAccountRegistrationState(status: AccountRegistrationState, reason: String) {
+            Log.d("VBotPhone", "status=$status")
+            when (status) {
+                AccountRegistrationState.Ok -> {
                     try {
                         Log.d("VBotPhone", "AccountRegistrationState.Ok")
-                        resultWrapper?.success(mapOf("displayName" to client.userDisplayName()))
+                        resultWrapper?.success(mapOf("displayName" to client.getAccountUsername()))
                     } catch (e: Exception) {
                         Log.d("VBotePhone", "error=$e")
                         return
                     }
                 }
 
-                ConnectState.ERROR -> {
+                AccountRegistrationState.Error -> {
                     try {
                         Log.d("VBotPhone", "AccountRegistrationState.Error")
                         resultWrapper?.error("ERROR", reason, null)
@@ -135,17 +137,16 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
         }
 
-        override fun onCallState(state: VBotCallState) {
+        override fun onCallState(state: CallState) {
             super.onCallState(state)
             runOnUiThread {
                 Log.d("VBotPhone", "callState: $state")
-                isIncoming = client.isIncomingCall()
                 val stateCall = when (state) {
-                    VBotCallState.NONE -> "none"
-                    VBotCallState.CALLING, VBotCallState.EARLY -> "calling"
-                    VBotCallState.INCOMING -> "incoming"
-                    VBotCallState.CONNECTING -> "connecting"
-                    VBotCallState.CONFIRMED -> "confirmed"
+                    CallState.Null -> "none"
+                    CallState.Calling, CallState.Early -> "calling"
+                    CallState.Incoming -> "incoming"
+                    CallState.Connecting -> "connecting"
+                    CallState.Confirmed -> "confirmed"
                     else ->  "disconnected"
                 }
 
@@ -222,7 +223,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     private fun isUserConnected(call: MethodCall, result: MethodChannel.Result) {
-        val isUserConnected = client.isUserConnected()
+        val isUserConnected = client.getStateAccount() == AccountRegistrationState.Ok
 
         val response = mapOf("isUserConnected" to isUserConnected)
         result.success(response)
@@ -230,7 +231,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
 
     private fun userDisplayName(call: MethodCall, result: MethodChannel.Result) {
-        val displayName = client.userDisplayName()
+        val displayName = client.getAccountUsername()
         val response = mapOf("userDisplayName" to displayName)
         result.success(response)
     }
@@ -243,14 +244,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     private fun disconnect(call: MethodCall, result: MethodChannel.Result) {
-        client.disconnect(
-            onSuccess = {
-                result.success(mapOf("disconnect" to true))
-            },
-            onFailure = { code, message ->
-                result.success(mapOf("disconnect" to false))
-            }
-        )
+        val disconnected = client.disconnect()
+        result.success(mapOf("disconnect" to disconnected))
     }
 
 
@@ -265,7 +260,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
             Log.d("VBotPhone", "phoneNumber=$phoneNumber--hotline=$hotline")
             nameCall = phoneNumber
-            client.startOutgoingCall(name, hotline, phoneNumber)
+            isIncoming = false
+            client.startCall(hotline, phoneNumber)
             result.success(mapOf("phoneNumber" to phoneNumber))
         } else {
             //check quyền
@@ -287,7 +283,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
     private fun speaker(call: MethodCall, result: MethodChannel.Result) {
         isSpeaker = !isSpeaker
-        client.speaker(isSpeaker)
+        client.onOffSpeaker(isSpeaker)
     }
 
     private fun sendDTMF(call: MethodCall, result: MethodChannel.Result) {
@@ -323,7 +319,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     private fun hangUp(call: MethodCall, result: MethodChannel.Result) {
-        client.endcall()
+        client.endCall()
     }
 
     private fun hasPermission(context: Context, permission: String): Boolean {

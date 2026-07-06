@@ -27,7 +27,7 @@ class CallActivity : AppCompatActivity() {
 
     private fun registerViewsEvent() {
         findViewById<ImageView>(R.id.btnRejectCall).setOnClickListener {
-            MainActivity.client.endcall()
+            MainActivity.client.endCall()
             finish()
         }
 

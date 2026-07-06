@@ -41,7 +41,7 @@ class FirebaseService : FirebaseMessagingService() {
                         } else {
                             try {
                                 if (MainActivity.clientExists())
-                                    MainActivity.client.endcall()
+                                    MainActivity.client.endCall()
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
