@@ -34,6 +34,10 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 
 object ChannelName {
     const val VBOT_CHANNEL = "com.vpmedia.vbot-sdk/vbot_phone"
@@ -58,10 +62,10 @@ enum class Methods(val value: String) {
 class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     EventChannel.StreamHandler {
 
-    private var tokenFirebase: String = ""
     private var resultWrapper: ResultWrapper? = null
 
     companion object {
+        var tokenFirebase: String = ""
         @SuppressLint("StaticFieldLeak")
         lateinit var client: VBotClient
 
@@ -76,14 +80,120 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         var isForeground = false
         var isWaitingToAnswer = false
 
+        // ═══════════════════════════════════════════════
+        // TRACKING CONTEXT — dùng để phân tích call end reason
+        // ═══════════════════════════════════════════════
+
+        /** Cuộc gọi đã từng đạt trạng thái Confirmed (đã bắt máy) chưa? */
+        var wasConfirmed = false
+
+        /** Timestamp khi cuộc gọi bắt đầu (Calling/Incoming) */
+        var callStartTimestamp: Long = 0
+
+        /** Timestamp khi cuộc gọi được confirmed (bắt máy) */
+        var callConfirmedTimestamp: Long = 0
+
+        /** User local chủ động hangup? */
+        var localHangup = false
+
+        /** Timestamp khi chuyển sang trạng thái Early (SIP 183 / 180 có early media) */
+        var callEarlyTimestamp: Long = 0L
+
+        /** Đánh dấu cuộc gọi có trải qua trạng thái Early không */
+        var isInEarlyState: Boolean = false
+
+        /** Thời gian shipper ở trong trạng thái Early (nghe nhạc chuông hoặc thông báo) */
+        var earlyDuration: Long = 0L
+
+        /** Timestamp khi shipper bấm gác máy */
+        var hangupTimestamp: Long = 0L
+
+        /** Lưu externalCallId để query server */
+        var externalCallId: String = ""
+
+        /** Lưu lịch sử trạng thái cuộc gọi */
+        var callStateHistory: MutableList<String> = mutableListOf()
+
+        /** Lưu transId của cuộc gọi hiện tại */
+        var currentTransId: String = ""
+
+        /** Đếm số callback được gọi trong 1 cuộc gọi */
+        var callbackCounter = 0
+
         fun clientExists(): Boolean {
             return ::client.isInitialized
         }
 
+        fun resetCallTracking() {
+            Log.d("VBotPhone", "🔄 [TRACKING] Reset all tracking vars")
+            wasConfirmed = false
+            callStartTimestamp = 0
+            callConfirmedTimestamp = 0
+            callEarlyTimestamp = 0
+            isInEarlyState = false
+            earlyDuration = 0
+            hangupTimestamp = 0
+            localHangup = false
+            externalCallId = ""
+            currentTransId = ""
+            callStateHistory.clear()
+            callbackCounter = 0
+        }
+
+        fun enableSdkLogging() {
+            try {
+                val clz = Class.forName("com.vpmedia.sdkvbot.client.VBotLogger")
+                val instanceField = clz.getDeclaredField("INSTANCE")
+                val logger = instanceField.get(null)
+                val debugField = clz.getDeclaredField("debugMode")
+                debugField.isAccessible = true
+                debugField.set(logger, true)
+                Log.i("VBotPhone", "🚀 [SDK-LOGGER] Đã kích hoạt VBotLogger.debugMode = true thành công!")
+            } catch (e: Exception) {
+                Log.w("VBotPhone", "⚠️ [SDK-LOGGER] Không thể gán debugMode qua reflection: ${e.message}")
+            }
+        }
+
         fun initClient(context: Context) {
+            enableSdkLogging()
             if (clientExists()) return
             client = VBotClient(context)
-            client.setup(VBotConfig(VBotEnvironment.PRODUCTION))
+            client.setup(VBotConfig(VBotEnvironment.STAGING))
+            enableSdkLogging()
+        }
+
+        fun getEndReasonVietnamese(reason: VBotEndCallReason): String {
+            return when (reason) {
+                VBotEndCallReason.normaly -> "Kết thúc bình thường (Normal)"
+                VBotEndCallReason.busy -> "Máy bận (Busy)"
+                VBotEndCallReason.timeOut -> "Hết thời gian chờ kết nối (Timeout)"
+                VBotEndCallReason.incomingCallTimeout -> "Hết thời gian chờ nhận cuộc gọi (Incoming Call Timeout)"
+                VBotEndCallReason.decline -> "Từ chối cuộc gọi (Decline)"
+                VBotEndCallReason.callerCanceled -> "Người gọi đã huỷ / gác máy (Caller Canceled)"
+                VBotEndCallReason.connectionError -> "Lỗi kết nối máy chủ (Connection Error)"
+                VBotEndCallReason.transmissionError -> "Lỗi đường truyền âm thanh / RTP (Transmission Error)"
+                VBotEndCallReason.destinationNotFound -> "Không tìm thấy số đích / máy nhánh (404 Not Found)"
+                VBotEndCallReason.destinationGone -> "Số máy nhánh không còn khả dụng (Destination Gone)"
+                VBotEndCallReason.temporarilyUnavailable -> "Tạm thời không liên lạc được (Temporarily Unavailable)"
+                VBotEndCallReason.recipientAbsent -> "Người nhận vắng mặt / không phản hồi (Recipient Absent)"
+                VBotEndCallReason.recipientBlocksCalls -> "Người nhận chặn cuộc gọi (Recipient Blocks Calls)"
+                VBotEndCallReason.doNotDisturb -> "Chế độ không làm phiền (Do Not Disturb)"
+                VBotEndCallReason.insufficientBalance -> "Tài khoản không đủ số dư (Insufficient Balance)"
+                VBotEndCallReason.packageExpired -> "Gói cước đã hết hạn (Package Expired)"
+                VBotEndCallReason.projectExpired -> "Dự án đã hết hạn (Project Expired)"
+                VBotEndCallReason.unauthenticated -> "Chưa xác thực tài khoản (Unauthenticated)"
+                VBotEndCallReason.authenticatedFailed -> "Xác thực thất bại (Authentication Failed)"
+                VBotEndCallReason.noAccount -> "Không tìm thấy tài khoản SIP (No Account)"
+                VBotEndCallReason.noVBotUser -> "Không tìm thấy người dùng VBot (No VBot User)"
+                VBotEndCallReason.invalidPhoneNumber -> "Số điện thoại không hợp lệ (Invalid Phone Number)"
+                VBotEndCallReason.microphonePermissionDenied -> "Chưa cấp quyền Microphone (Microphone Permission Denied)"
+                VBotEndCallReason.anotherCallInProgress -> "Đang có cuộc gọi khác đang diễn ra (Another Call In Progress)"
+                VBotEndCallReason.unknownError -> "Lỗi không xác định (Unknown Error)"
+                else -> {
+                    val desc = try { reason.description } catch (_: Exception) { null }
+                    if (!desc.isNullOrEmpty()) desc else reason.name
+                }
+            }
         }
     }
 
@@ -99,33 +209,95 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
     private var listener = object : ClientListener() {
         override fun onUserConnected(displayName: String) {
-            Log.d("VBotPhone", "onUserConnected: $displayName")
+            runOnUiThread {
+                Log.d("VBotPhone", "onUserConnected: $displayName")
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = currentCallState,
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    message = "👤 [User Connected] Đã kết nối người dùng: $displayName"
+                )
+                events?.success(callSink.toMap())
+            }
         }
 
         override fun onAccountRegistrationState(status: AccountRegistrationState, reason: String) {
-            Log.d("VBotPhone", "onAccountRegistrationState: status=$status, reason=$reason")
+            runOnUiThread {
+                Log.d("VBotPhone", "onAccountRegistrationState: status=$status, reason=$reason")
+                val statusText = if (status == AccountRegistrationState.Ok) "🟢 Đã đăng ký SIP thành công (Ok)" else "🔴 Trạng thái SIP: $status"
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = currentCallState,
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    message = "🌐 [SIP Registration] $statusText (Lý do: $reason)"
+                )
+                events?.success(callSink.toMap())
+            }
         }
 
         override fun onCallState(state: CallState) {
             runOnUiThread {
-                Log.d("VBotPhone", "onCallState: $state")
+                val hasActive = if (clientExists()) client.hasActiveCall() else false
+                val duration = if (clientExists()) client.getDuration() else null
+
+                // ══════ TRACKING: ghi lại lịch sử ══════
+                callbackCounter++
+                callStateHistory.add("${state.name}@${System.currentTimeMillis()}")
+                Log.d("VBotPhone", "═══════════════════════════════════════")
+                Log.d("VBotPhone", "📊 [CALLBACK #$callbackCounter] onCallState: ${state.name}")
+                Log.d("VBotPhone", "  ├─ hasActiveCall=$hasActive")
+                Log.d("VBotPhone", "  ├─ duration=$duration")
+                Log.d("VBotPhone", "  ├─ wasConfirmed=$wasConfirmed")
+                Log.d("VBotPhone", "  ├─ isIncoming=$isIncoming")
+                Log.d("VBotPhone", "  ├─ localHangup=$localHangup")
+                Log.d("VBotPhone", "  └─ history=${callStateHistory.joinToString(" → ")}")
+                Log.d("VBotPhone", "═══════════════════════════════════════")
+
                 currentCallState = when (state) {
                     CallState.Null -> {
                         isIncoming = false
                         "none"
                     }
-                    CallState.Calling, CallState.Early -> {
+                    CallState.Calling -> {
                         isIncoming = false
+                        // ══ TRACKING: ghi timestamp bắt đầu gọi ══
+                        if (callStartTimestamp == 0L) {
+                            callStartTimestamp = System.currentTimeMillis()
+                            localHangup = false
+                            Log.d("VBotPhone", "⏱️ [TRACKING] Call started (CALLING) at: $callStartTimestamp")
+                        }
+                        "calling"
+                    }
+                    CallState.Early -> {
+                        isIncoming = false
+                        if (callStartTimestamp == 0L) {
+                            callStartTimestamp = System.currentTimeMillis()
+                            localHangup = false
+                        }
+                        if (callEarlyTimestamp == 0L) {
+                            callEarlyTimestamp = System.currentTimeMillis()
+                            isInEarlyState = true
+                            val callingWait = callEarlyTimestamp - callStartTimestamp
+                            Log.d("VBotPhone", "🎵 [TRACKING] Cuộc gọi chuyển sang EARLY (SIP 183 Early Media / 180 Ringback) sau ${callingWait}ms Calling")
+                            Log.d("VBotPhone", "  └─ 📢 Đang nhận luồng âm thanh hoặc thông báo tự động từ tổng đài!")
+                        }
                         "calling"
                     }
                     CallState.Incoming -> {
                         isIncoming = true
-                        // Ưu tiên tên từ push data (đã set ở FirebaseService),
-                        // fallback sang SDK callName nếu chưa có
+                        // ══ TRACKING: ghi timestamp nhận cuộc gọi ══
+                        if (callStartTimestamp == 0L) {
+                            callStartTimestamp = System.currentTimeMillis()
+                            localHangup = false
+                            Log.d("VBotPhone", "⏱️ [TRACKING] Incoming call at: $callStartTimestamp")
+                        }
                         if (nameCall.isEmpty()) {
                             nameCall = client.callName() ?: ""
                         }
-                        // Nếu app đang ở Foreground -> xóa notification banner
                         if (isForeground) {
                             try {
                                 val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -136,7 +308,11 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     }
                     CallState.Connecting -> "connecting"
                     CallState.Confirmed -> {
-                        // Hiện ongoing notification khi cuộc gọi active
+                        // ═══ TRACKING: đánh dấu đã bắt máy ═══
+                        wasConfirmed = true
+                        callConfirmedTimestamp = System.currentTimeMillis()
+                        Log.d("VBotPhone", "✅ [TRACKING] Call CONFIRMED at: $callConfirmedTimestamp")
+                        Log.d("VBotPhone", "  └─ Ring duration: ${callConfirmedTimestamp - callStartTimestamp}ms")
                         OngoingCallNotification.show(
                             applicationContext,
                             nameCall.ifEmpty { "Cuộc gọi" }
@@ -146,18 +322,19 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     else -> {
                         isMute = false
                         isSpeaker = false
-                        // Hủy ongoing notification khi cuộc gọi kết thúc
                         OngoingCallNotification.cancel(applicationContext)
+                        Log.d("VBotPhone", "📊 [CALLBACK #$callbackCounter] onCallState: Disconnected — ĐÂY KHÔNG PHẢI HÀM TRẢ KẾT QUẢ (không có endedReason/endedBy)")
                         "disconnected"
                     }
                 }
 
                 val callSink = CallSink(
-                    nameCall,
-                    currentCallState,
-                    isIncoming,
-                    isMute,
-                    onHold
+                    name = nameCall,
+                    state = currentCallState,
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    message = "⚡ [onCallState] -> ${state.name.uppercase()} (hasActiveCall=$hasActive, duration=${duration ?: 0}s, incoming=$isIncoming)"
                 )
                 events?.success(callSink.toMap())
 
@@ -165,38 +342,417 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     isIncoming = false
                     nameCall = ""
                     currentCallState = "none"
+                    // Lưu ý: KHÔNG reset tracking vars ở đây
+                    // để onCallEnded còn dùng, reset sau trong onCallEnded
                 }
             }
         }
 
         override fun onCallEnded(reason: VBotEndCallReason, endedBy: VBotCallEndParty) {
-            Log.d("VBotPhone", "onCallEnded: reason=${reason.name}, endedBy=${endedBy.name}")
+            runOnUiThread {
+                callbackCounter++
+                val now = System.currentTimeMillis()
+                val totalDuration = if (callStartTimestamp > 0) now - callStartTimestamp else 0
+                val confirmedDuration = if (wasConfirmed && callConfirmedTimestamp > 0) now - callConfirmedTimestamp else 0
+                if (localHangup && isInEarlyState && callEarlyTimestamp > 0 && earlyDuration == 0L) {
+                    earlyDuration = (if (hangupTimestamp > 0) hangupTimestamp else now) - callEarlyTimestamp
+                }
+
+                // ═══════════════════════════════════════════════════
+                // LOG 1: ⭐ HÀM TRẢ KẾT QUẢ — onCallEnded(2 params)
+                // ═══════════════════════════════════════════════════
+                Log.d("VBotPhone", "🔴🔴🔴═══════════════════════════════════════")
+                Log.d("VBotPhone", "🔴 [CALLBACK #$callbackCounter] onCallEnded(reason, endedBy)")
+                Log.d("VBotPhone", "🔴 ⭐ ĐÂY LÀ HÀM TRẢ KẾT QUẢ (có endedReason + endedBy)")
+                Log.d("VBotPhone", "  ├─ SDK reason     : ${reason.name}")
+                Log.d("VBotPhone", "  ├─ SDK endedBy    : ${endedBy.name}")
+                Log.d("VBotPhone", "  ├─ wasConfirmed   : $wasConfirmed")
+                Log.d("VBotPhone", "  ├─ localHangup    : $localHangup")
+                Log.d("VBotPhone", "  ├─ isIncoming     : $isIncoming")
+                Log.d("VBotPhone", "  ├─ isInEarlyState : $isInEarlyState")
+                Log.d("VBotPhone", "  ├─ earlyDuration  : ${earlyDuration}ms (${earlyDuration / 1000}s)")
+                Log.d("VBotPhone", "  ├─ totalDuration  : ${totalDuration}ms (${totalDuration/1000}s)")
+                Log.d("VBotPhone", "  ├─ confirmedDur   : ${confirmedDuration}ms")
+                Log.d("VBotPhone", "  ├─ externalCallId : $externalCallId")
+                Log.d("VBotPhone", "  └─ stateHistory   : ${callStateHistory.joinToString(" → ")}")
+                Log.d("VBotPhone", "🔴🔴🔴═══════════════════════════════════════")
+
+                // ═══════════════════════════════════════════════════
+                // DIAGNOSTIC LOG (Case 3 / Case 4 / Case 5)
+                // ═══════════════════════════════════════════════════
+                Log.d("VBotPhone", "🎯═══════════════════════════════════════")
+                Log.d("VBotPhone", "🎯 [TEST TRACKING DIAGNOSTIC]:")
+                Log.d("VBotPhone", "  ├─ SDK raw reason   : ${reason.name}")
+                Log.d("VBotPhone", "  ├─ SDK raw endedBy  : ${endedBy.name}")
+                Log.d("VBotPhone", "  ├─ Ring duration    : ${totalDuration}ms (${totalDuration / 1000}s)")
+                Log.d("VBotPhone", "  ├─ wasConfirmed     : $wasConfirmed")
+                Log.d("VBotPhone", "  ├─ isIncoming       : $isIncoming")
+                Log.d("VBotPhone", "  ├─ isInEarlyState   : $isInEarlyState")
+                Log.d("VBotPhone", "  ├─ earlyDuration    : ${earlyDuration}ms (${earlyDuration / 1000}s)")
+                Log.d("VBotPhone", "  ├─ externalCallId   : $externalCallId")
+                when {
+                    localHangup && !wasConfirmed && !isIncoming && isInEarlyState -> {
+                        Log.w("VBotPhone", "  🚨═══════════════════════════════════════════════")
+                        Log.w("VBotPhone", "  🚨 [CASE CHẾ ĐỘ MÁY BAY / EARLY MEDIA ANNOUNCEMENT]:")
+                        Log.w("VBotPhone", "  🚨 Shipper cúp máy sau ${earlyDuration / 1000}s nghe thông báo tự động (Early Media)!")
+                        Log.w("VBotPhone", "  🚨 SDK gốc trả về: ${reason.name} / ${endedBy.name}")
+                        Log.w("VBotPhone", "  🚨 Kỳ vọng nghiệp vụ: recipientAbsent (nếu máy bay/thuê bao).")
+                        Log.w("VBotPhone", "  🚨 Nhưng hiện tại đang bị Case 6 map thành callerCanceled do localHangup=true!")
+                        Log.w("VBotPhone", "  🚨═══════════════════════════════════════════════")
+                    }
+                    localHangup && !wasConfirmed && !isIncoming -> {
+                        if (reason == VBotEndCallReason.callerCanceled) {
+                            Log.d("VBotPhone", "  └─ ✅ CASE 6: SDK TRẢ ĐÚNG callerCanceled (SIP 487 / Cancel)!")
+                        } else {
+                            Log.d("VBotPhone", "  └─ 🎯 CASE 6: Người gọi chủ động dập máy (localHangup=true, chưa bắt máy) → SDK trả ${reason.name}. Cần fix trong SDK!")
+                        }
+                    }
+                    reason == VBotEndCallReason.destinationNotFound -> {
+                        Log.d("VBotPhone", "  └─ ✅ CASE 7: SDK TRẢ ĐÚNG destinationNotFound (SIP 404 / Không tìm thấy số đích)!")
+                    }
+                    reason == VBotEndCallReason.invalidPhoneNumber -> {
+                        Log.d("VBotPhone", "  └─ ✅ CASE 7: SDK TRẢ ĐÚNG invalidPhoneNumber (Số điện thoại không hợp lệ / Mã 2004)!")
+                    }
+                    reason == VBotEndCallReason.timeOut -> {
+                        Log.d("VBotPhone", "  └─ ✅ CASE 5: SDK TRẢ ĐÚNG timeOut (SIP 408)!")
+                    }
+                    reason == VBotEndCallReason.temporarilyUnavailable && totalDuration / 1000 > 25 && !wasConfirmed -> {
+                        Log.d("VBotPhone", "  └─ ⚠️ CASE 5: Ring ${totalDuration / 1000}s (>25s) → SDK trả temporarilyUnavailable (SIP 480). Cần server gửi SIP 408!")
+                    }
+                    reason == VBotEndCallReason.doNotDisturb -> {
+                        Log.d("VBotPhone", "  └─ ✅ CASE 4: SDK TRẢ ĐÚNG doNotDisturb (SIP 409)!")
+                    }
+                    reason == VBotEndCallReason.recipientBlocksCalls -> {
+                        Log.d("VBotPhone", "  └─ ✅ CASE 3: SDK TRẢ ĐÚNG recipientBlocksCalls (SIP 403)!")
+                    }
+                    reason == VBotEndCallReason.temporarilyUnavailable && totalDuration / 1000 < 5 -> {
+                        Log.d("VBotPhone", "  └─ ⚠️ Ngắt tức thì (<5s): SDK trả temporarilyUnavailable (SIP 480). Cần đối chiếu Server xem là Case 7 (404), Case 3 (403) hay Case 4 (409)!")
+                    }
+                    reason == VBotEndCallReason.busy -> {
+                        Log.d("VBotPhone", "  └─ ℹ️ SDK trả busy (SIP 486).")
+                    }
+                    else -> {
+                        Log.d("VBotPhone", "  └─ ℹ️ SDK trả ${reason.name}. Cần đối chiếu Server (externalCallId=$externalCallId)")
+                    }
+                }
+                Log.d("VBotPhone", "🎯═══════════════════════════════════════")
+
+                // ═══════════════════════════════════════════════════
+                // RESOLVER: Phân tích và trả kết quả cuối cùng
+                // ═══════════════════════════════════════════════════
+                val resolvedReason: VBotEndCallReason
+                val resolvedConfidence: String
+                val resolvedExplanation: String
+
+                when {
+                    // CASE 1: decline + wasConfirmed → normaly
+                    reason == VBotEndCallReason.decline && wasConfirmed -> {
+                        resolvedReason = VBotEndCallReason.normaly
+                        resolvedConfidence = "high"
+                        resolvedExplanation = "CASE 1: Cuộc gọi đã confirmed (bắt máy) rồi kết thúc → normaly"
+                    }
+                    // CASE 6: localHangup + chưa confirmed + outgoing → callerCanceled
+                    localHangup && !wasConfirmed && !isIncoming -> {
+                        resolvedReason = VBotEndCallReason.callerCanceled
+                        resolvedConfidence = "high"
+                        resolvedExplanation = "CASE 6: Người gọi chủ động hủy trước khi bắt máy (localHangup=true) → callerCanceled"
+                    }
+                    // CASE 5: temporarilyUnavailable + > 25s → timeout
+                    reason == VBotEndCallReason.temporarilyUnavailable && totalDuration / 1000 > 25 && !wasConfirmed -> {
+                        resolvedReason = VBotEndCallReason.timeOut
+                        resolvedConfidence = "high"
+                        resolvedExplanation = "CASE 5: Ring ${totalDuration/1000}s > 25s → timeout"
+                    }
+                    // CASE 2/3/4/7: temporarilyUnavailable — giữ nguyên SDK, chờ server sửa SIP code
+                    // Root cause: SIP server trả 480 thay vì 603 khi callee reject
+                    // Khi server sửa, SDK sẽ tự động map đúng 603 → decline
+                    reason == VBotEndCallReason.temporarilyUnavailable && !wasConfirmed -> {
+                        resolvedReason = reason
+                        resolvedConfidence = "sdk_original"
+                        resolvedExplanation = "temporarilyUnavailable ring ${totalDuration/1000}s — giữ nguyên SDK, chờ server sửa SIP code (480→603)"
+                    }
+                    // Các case khác: giữ nguyên SDK
+                    else -> {
+                        resolvedReason = reason
+                        resolvedConfidence = "sdk_original"
+                        resolvedExplanation = "SDK reason không cần điều chỉnh"
+                    }
+                }
+
+                val wasAdjusted = resolvedReason != reason
+                Log.d("VBotPhone", "🟢═══════════════════════════════════════")
+                Log.d("VBotPhone", "🟢 [RESOLVED] KẾT QUẢ CUỐI CÙNG:")
+                Log.d("VBotPhone", "  ├─ SDK gốc       : ${reason.name}")
+                Log.d("VBotPhone", "  ├─ Resolved      : ${resolvedReason.name}")
+                Log.d("VBotPhone", "  ├─ Confidence    : $resolvedConfidence")
+                Log.d("VBotPhone", "  ├─ Đã điều chỉnh : ${if (wasAdjusted) "✅ CÓ" else "❌ KHÔNG"}")
+                Log.d("VBotPhone", "  ├─ Giải thích    : $resolvedExplanation")
+                Log.d("VBotPhone", "  └─ Server kỳ vọng: Cần kiểm tra → externalCallId=$externalCallId")
+                Log.d("VBotPhone", "🟢═══════════════════════════════════════")
+
+                val reasonVi = getEndReasonVietnamese(resolvedReason)
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = "disconnected",
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    endedReason = resolvedReason.key,
+                    endedBy = endedBy.key,
+                    message = buildString {
+                        append("🔴 [onCallEnded] $reasonVi (${resolvedReason.name}), Kết thúc bởi: ${endedBy.name}")
+                        append("\n📊 SDK gốc: reason=${reason.name}, endedBy=${endedBy.name}")
+                        append("\n🔄 Resolver: ${resolvedReason.name} ($resolvedConfidence)")
+                        append("\n⏱️ Duration: total=${totalDuration/1000}s, confirmed=${confirmedDuration/1000}s")
+                        if (wasAdjusted) {
+                            append("\n⚠️ ĐÃ ĐIỀU CHỈNH: ${reason.name} → ${resolvedReason.name}")
+                            append("\n📝 $resolvedExplanation")
+                        }
+                    }
+                )
+                events?.success(callSink.toMap())
+
+                // ═══ Reset tracking sau khi đã dùng xong ═══
+                resetCallTracking()
+            }
+        }
+
+        override fun onCallEnded(reason: VBotEndCallReason) {
+            runOnUiThread {
+                callbackCounter++
+                val now = System.currentTimeMillis()
+                val totalDuration = if (callStartTimestamp > 0) now - callStartTimestamp else 0
+
+                Log.d("VBotPhone", "🔴═══════════════════════════════════════")
+                Log.d("VBotPhone", "🔴 [CALLBACK #$callbackCounter] onCallEnded(1 param) — KHÔNG có endedBy")
+                Log.d("VBotPhone", "  ├─ SDK reason     : ${reason.name}")
+                Log.d("VBotPhone", "  ├─ wasConfirmed   : $wasConfirmed")
+                Log.d("VBotPhone", "  ├─ totalDuration  : ${totalDuration}ms")
+                Log.d("VBotPhone", "  └─ stateHistory   : ${callStateHistory.joinToString(" → ")}")
+                Log.d("VBotPhone", "🔴═══════════════════════════════════════")
+
+                val resolvedReason = if (reason == VBotEndCallReason.decline && wasConfirmed) {
+                    Log.d("VBotPhone", "🟢 [CASE1-RESOLVED] decline → normaly")
+                    VBotEndCallReason.normaly
+                } else {
+                    reason
+                }
+
+                val wasAdjusted = resolvedReason != reason
+                val reasonVi = getEndReasonVietnamese(resolvedReason)
+                Log.d("VBotPhone", "🟢 [RESOLVED] ${reason.name} → ${resolvedReason.name} (adjusted=$wasAdjusted)")
+
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = "disconnected",
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    endedReason = resolvedReason.key,
+                    endedBy = "unknown",
+                    message = buildString {
+                        append("🔴 [onCallEnded(1 param)] $reasonVi (${resolvedReason.name})")
+                        append("\n📊 SDK gốc: reason=${reason.name}")
+                        append("\n⏱️ Duration: total=${totalDuration/1000}s")
+                        if (wasAdjusted) {
+                            append("\n⚠️ ĐÃ ĐIỀU CHỈNH: ${reason.name} → ${resolvedReason.name}")
+                        }
+                    }
+                )
+                events?.success(callSink.toMap())
+
+                // ═══ Reset tracking ═══
+                resetCallTracking()
+            }
         }
 
         override fun onExternalCallId(externalCallId: String) {
-            Log.d("VBotPhone", "onExternalCallId: $externalCallId")
+            callbackCounter++
+            Log.d("VBotPhone", "═══════════════════════════════════════")
+            Log.d("VBotPhone", "📊 [CALLBACK #$callbackCounter] onExternalCallId")
+            Log.d("VBotPhone", "  └─ externalCallId: $externalCallId")
+            Log.d("VBotPhone", "═══════════════════════════════════════")
+            // ══ TRACKING: lưu ID để so sánh với server ══
+            MainActivity.externalCallId = externalCallId
+            runOnUiThread {
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = currentCallState,
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    message = "🆔 [External Call ID]: $externalCallId"
+                )
+                events?.success(callSink.toMap())
+            }
         }
 
         override fun onCallMuteStateChanged(muted: Boolean) {
-            Log.d("VBotPhone", "onCallMuteStateChanged: muted=$muted (ignored, we manage mute state locally)")
+            Log.d("VBotPhone", "onCallMuteStateChanged: muted=$muted")
+            runOnUiThread {
+                isMute = muted
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = currentCallState,
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    message = "🎙️ [Mute State Changed]: $muted"
+                )
+                events?.success(callSink.toMap())
+            }
         }
 
         override fun onNetworkUnreachable() {
-            Log.d("VBotPhone", "onNetworkUnreachable")
+            val hasActive = if (clientExists()) client.hasActiveCall() else false
+            val duration = if (clientExists()) client.getDuration() else 0
+            val now = System.currentTimeMillis()
+            Log.w("VBotPhone", "⚠️⚠️⚠️═══════════════════════════════════════")
+            Log.w("VBotPhone", "⚠️ [CALLBACK] onNetworkUnreachable() ĐƯỢC GỌI TỪ SDK!")
+            Log.w("VBotPhone", "  ├─ Timestamp     : $now")
+            Log.w("VBotPhone", "  ├─ CallState     : $currentCallState")
+            Log.w("VBotPhone", "  ├─ hasActiveCall : $hasActive")
+            Log.w("VBotPhone", "  ├─ Duration      : ${duration}s")
+            Log.w("VBotPhone", "  ├─ TransId       : $currentTransId")
+            Log.w("VBotPhone", "  └─ wasConfirmed  : $wasConfirmed")
+            Log.w("VBotPhone", "⚠️⚠️⚠️═══════════════════════════════════════")
+            runOnUiThread {
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = currentCallState,
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    message = "⚠️ [SDK Callback] onNetworkUnreachable() - Mạng không thể truy cập (hasActive=$hasActive, dur=${duration}s)"
+                )
+                events?.success(callSink.toMap())
+            }
         }
 
         override fun onErrorCode(erCode: Int, message: String) {
             Log.d("VBotPhone", "onErrorCode: $erCode -- $message")
             runOnUiThread {
+                val callSink = CallSink(
+                    name = nameCall,
+                    state = currentCallState,
+                    isIncoming = isIncoming,
+                    isMute = isMute,
+                    onHold = onHold,
+                    message = "❌ [Lỗi SDK $erCode]: $message"
+                )
+                events?.success(callSink.toMap())
                 resultWrapper?.error(erCode.toString(), message, null)
             }
         }
+    }
+
+    private var connectivityManager: ConnectivityManager? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var networkLostTimestamp: Long = 0L
+
+    private fun setupNetworkMonitoring() {
+        if (networkCallback != null) return
+        try {
+            connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+
+            networkCallback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    super.onAvailable(network)
+                    val now = System.currentTimeMillis()
+                    val disconnectDuration = if (networkLostTimestamp > 0) now - networkLostTimestamp else 0
+                    val hasActive = if (clientExists()) client.hasActiveCall() else false
+                    val duration = if (wasConfirmed && callConfirmedTimestamp > 0) ((now - callConfirmedTimestamp) / 1000).toInt() else 0
+
+                    Log.i("VBotPhone", "🌐🌐🌐═════════════════════════════════════════════════════")
+                    Log.i("VBotPhone", "🌐 [NETWORK MONITOR] ✅ CÓ MẠNG TRỞ LẠI (onAvailable)")
+                    Log.i("VBotPhone", "  ├─ Timestamp          : $now")
+                    Log.i("VBotPhone", "  ├─ Disconnect Dur     : ${disconnectDuration}ms (${disconnectDuration / 1000}s)")
+                    Log.i("VBotPhone", "  ├─ CallState          : $currentCallState")
+                    Log.i("VBotPhone", "  ├─ hasActiveCall      : $hasActive")
+                    Log.i("VBotPhone", "  ├─ Call Duration      : ${duration}s")
+                    Log.i("VBotPhone", "  ├─ TransId            : $currentTransId")
+                    Log.i("VBotPhone", "  ├─ wasConfirmed       : $wasConfirmed")
+                    Log.i("VBotPhone", "  └─ isIncoming         : $isIncoming")
+                    Log.i("VBotPhone", "🌐🌐🌐═════════════════════════════════════════════════════")
+
+                    runOnUiThread {
+                        val callSink = CallSink(
+                            name = nameCall,
+                            state = currentCallState,
+                            isIncoming = isIncoming,
+                            isMute = isMute,
+                            onHold = onHold,
+                            message = "🌐 [Mạng] ✅ Có mạng trở lại sau ${disconnectDuration / 1000}s! (CallState=$currentCallState, hasActive=$hasActive, duration=${duration}s)"
+                        )
+                        events?.success(callSink.toMap())
+                    }
+
+                    // SDK đã tự động quản lý NetworkCallback bên trong (VBotClient.registerNetworkMonitor)
+                    // và tự động kích hoạt handleIpChange() kèm debounce 1000ms.
+                }
+
+                override fun onLost(network: Network) {
+                    super.onLost(network)
+                    networkLostTimestamp = System.currentTimeMillis()
+                    val hasActive = if (clientExists()) client.hasActiveCall() else false
+                    val duration = if (wasConfirmed && callConfirmedTimestamp > 0) ((networkLostTimestamp - callConfirmedTimestamp) / 1000).toInt() else 0
+
+                    Log.w("VBotPhone", "🚨🚨🚨═════════════════════════════════════════════════════")
+                    Log.w("VBotPhone", "🚨 [NETWORK MONITOR] ❌ MẤT MẠNG ĐỘT NGỘT (onLost)")
+                    Log.w("VBotPhone", "  ├─ Timestamp      : $networkLostTimestamp")
+                    Log.w("VBotPhone", "  ├─ CallState      : $currentCallState")
+                    Log.w("VBotPhone", "  ├─ hasActiveCall  : $hasActive")
+                    Log.w("VBotPhone", "  ├─ Duration       : ${duration}s")
+                    Log.w("VBotPhone", "  ├─ TransId        : $currentTransId")
+                    Log.w("VBotPhone", "  ├─ wasConfirmed   : $wasConfirmed")
+                    Log.w("VBotPhone", "  └─ isIncoming     : $isIncoming")
+                    Log.w("VBotPhone", "🚨🚨🚨═════════════════════════════════════════════════════")
+
+                    runOnUiThread {
+                        val callSink = CallSink(
+                            name = nameCall,
+                            state = currentCallState,
+                            isIncoming = isIncoming,
+                            isMute = isMute,
+                            onHold = onHold,
+                            message = "🚨 [Mạng] ❌ Đã mất kết nối mạng! (CallState=$currentCallState, hasActive=$hasActive, duration=${duration}s)"
+                        )
+                        events?.success(callSink.toMap())
+                    }
+                }
+
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+                    val hasInternet = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    val isValidated = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                    Log.d("VBotPhone", "📶 [NETWORK MONITOR] onCapabilitiesChanged: Internet=$hasInternet, Validated=$isValidated")
+                }
+            }
+
+            connectivityManager?.registerNetworkCallback(request, networkCallback!!)
+            Log.d("VBotPhone", "✅ [NETWORK MONITOR] Đã đăng ký NetworkCallback thành công")
+        } catch (e: Exception) {
+            Log.e("VBotPhone", "❌ [NETWORK MONITOR] Lỗi đăng ký NetworkCallback: ${e.message}")
+        }
+    }
+
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            networkCallback?.let { connectivityManager?.unregisterNetworkCallback(it) }
+            networkCallback = null
+        } catch (_: Exception) {}
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         initClient(context)
         client.addListener(listener)
         getTokenFirebase()
+        setupNetworkMonitoring()
 
         GeneratedPluginRegistrant.registerWith(flutterEngine)
 
@@ -213,24 +769,15 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         super.onNewIntent(intent)
         setIntent(intent)
 
-        // App được mở từ background khi có cuộc gọi đến
         if (intent.getBooleanExtra("from_incoming_call", false)) {
             emitCurrentCallState()
         }
     }
 
-    /**
-     * Emit trạng thái cuộc gọi hiện tại cho Flutter.
-     * Cần thiết khi app được mở từ background — Flutter engine có thể
-     * đã miss event ban đầu.
-     */
     private fun emitCurrentCallState() {
         if (!clientExists() || !client.hasActiveCall()) return
-        // Không emit state cho cuộc gọi đã kết thúc — tránh Flutter mở
-        // call screen rồi tắt ngay (flash UI)
         if (currentCallState == "disconnected" || currentCallState == "none") return
 
-        // Chỉ fallback sang client.callName() nếu chưa có tên từ push data
         if (nameCall.isEmpty()) {
             nameCall = client.callName() ?: ""
         }
@@ -242,8 +789,17 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             if (duration != null && duration > 0) "confirmed" else "incoming"
         }
 
-        val callSink = CallSink(nameCall, state, isIncoming, isMute, onHold)
-        events?.success(callSink.toMap())
+        val callSink = CallSink(
+            name = nameCall,
+            state = state,
+            isIncoming = isIncoming,
+            isMute = isMute,
+            onHold = onHold,
+            message = "🔄 [Sync State] Cập nhật trạng thái cuộc gọi khi mở app: $state"
+        )
+        runOnUiThread {
+            events?.success(callSink.toMap())
+        }
     }
 
     private fun requestCallPermissions() {
@@ -258,7 +814,6 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             requestPermissions(ungranted.toTypedArray(), 1)
         }
 
-        // Xin quyền "Hiển thị trên các ứng dụng khác" (SYSTEM_ALERT_WINDOW / Display over other apps)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(context)) {
                 val intent = Intent(
@@ -269,7 +824,6 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             }
         }
 
-        // Xin quyền Full Screen Intent trên Android 14+ nếu chưa được cấp (được rút ra từ kinh nghiệm vbot_android fixes)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (!notificationManager.canUseFullScreenIntent()) {
@@ -286,18 +840,24 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         }
     }
 
-    private fun getTokenFirebase() {
+    private fun getTokenFirebase(callback: ((String) -> Unit)? = null) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             try {
                 if (task.isSuccessful) {
                     val token = task.result
                     if (!token.isNullOrEmpty()) {
                         tokenFirebase = token
+                        Log.d("VBotPhone", "Firebase token retrieved successfully: $tokenFirebase")
+                        callback?.invoke(token)
+                        return@addOnCompleteListener
                     }
+                } else {
+                    Log.e("VBotPhone", "Failed to get Firebase token: ${task.exception?.message}")
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("VBotPhone", "Exception in getTokenFirebase: ${e.message}")
             }
+            callback?.invoke(tokenFirebase)
         }
     }
 
@@ -342,28 +902,39 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         val baseUrl = (args?.get("baseUrl") ?: "") as String
 
         val environment = try {
-            VBotEnvironment.valueOf(envStr)
+            if (envStr.isNotEmpty()) VBotEnvironment.valueOf(envStr.uppercase()) else VBotEnvironment.STAGING
         } catch (_: Exception) {
-            VBotEnvironment.PRODUCTION
+            VBotEnvironment.STAGING
         }
         val customUrl = if (baseUrl.isNotEmpty()) baseUrl else null
         val config = VBotConfig(environment, customUrl)
         client.setup(config)
 
-        val fcm = if (tokenFirebase.isNotEmpty()) tokenFirebase else "dummy_fcm_token_sample"
-        Log.d("VBotPhone", "connect: token length=${token.length}, env=$envStr, customUrl=$customUrl, fcmToken=$fcm")
+        val executeConnect = { fcm: String ->
+            val finalFcm = if (fcm.isNotEmpty()) fcm else "dummy_fcm_token_sample"
+            Log.d("VBotPhone", "connect: token length=${token.length}, env=$envStr, customUrl=$customUrl, fcmToken=$finalFcm")
 
-        client.connect(token, fcm, VBotCompletion { displayName, error ->
-            runOnUiThread {
-                if (error == null) {
-                    Log.d("VBotPhone", "connect SUCCESS: displayName=$displayName")
-                    resultWrapper?.success(mapOf("displayName" to (displayName ?: "")))
-                } else {
-                    Log.d("VBotPhone", "connect ERROR: code=${error.code}, message=${error.message}")
-                    resultWrapper?.error(error.code.toString(), error.message, null)
+            client.connect(token, finalFcm, VBotCompletion { displayName, error ->
+                runOnUiThread {
+                    if (error == null) {
+                        Log.d("VBotPhone", "connect SUCCESS: displayName=$displayName")
+                        resultWrapper?.success(mapOf("displayName" to (displayName ?: "")))
+                    } else {
+                        Log.d("VBotPhone", "connect ERROR: code=${error.code}, message=${error.message}")
+                        resultWrapper?.error(error.code.toString(), error.message, null)
+                    }
                 }
+            })
+        }
+
+        if (tokenFirebase.isNotEmpty()) {
+            executeConnect(tokenFirebase)
+        } else {
+            Log.d("VBotPhone", "tokenFirebase is empty, fetching FCM token before connect...")
+            getTokenFirebase { fcm ->
+                executeConnect(fcm)
             }
-        })
+        }
     }
 
     private fun disconnect(call: MethodCall) {
@@ -383,8 +954,12 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         val phoneNumber = (args?.get("phoneNumber") ?: "") as String
         val hotline = (args?.get("hotline") ?: "") as String
 
+        resetCallTracking()
         nameCall = phoneNumber
         isIncoming = false
+        callStartTimestamp = System.currentTimeMillis()
+        Log.d("VBotPhone", "📞 [START CALL] Bắt đầu gọi: $phoneNumber qua Hotline: $hotline (timestamp=$callStartTimestamp)")
+        Log.d("VBotPhone", "📞 [TEST NOTE] Đang theo dõi cuộc gọi (đặc biệt cho Case 3: Chặn cuộc gọi)...")
 
         client.startOutgoingCall(
             hotline,
@@ -425,26 +1000,73 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     /**
-     * FCM can arrive before the SIP INVITE has created the SDK call object. The
-     * native incoming-call screen waits for that object before answering; keep
-     * the Flutter bridge on the same contract.
+     * Chờ cuộc gọi active từ SIP rồi thực hiện answerCall().
+     * Gửi log chi tiết qua EventChannel cho Flutter Box Log.
      */
     private fun answerIncomingCallWhenReady() {
-        if (isWaitingToAnswer) return
+        val initialHasActive = if (clientExists()) client.hasActiveCall() else false
+        Log.d("VBotPhone", "👉 answerIncomingCallWhenReady() invoked, clientExists=${clientExists()}, hasActiveCall=$initialHasActive")
+        
+        if (isWaitingToAnswer) {
+            Log.d("VBotPhone", "⚠️ Đang trong hàng đợi chờ trả lời cuộc gọi (isWaitingToAnswer=true)")
+            val callSink = CallSink(
+                name = nameCall,
+                state = currentCallState,
+                isIncoming = isIncoming,
+                isMute = isMute,
+                onHold = onHold,
+                message = "⚠️ Đang trong hàng đợi chờ kết nối cuộc gọi để bắt máy..."
+            )
+            events?.success(callSink.toMap())
+            return
+        }
         isWaitingToAnswer = true
 
         val handler = Handler(Looper.getMainLooper())
         var attempts = 0
         val answerWhenReady = object : Runnable {
             override fun run() {
-                if (client.hasActiveCall()) {
+                val hasCall = if (clientExists()) client.hasActiveCall() else false
+                Log.d("VBotPhone", "⏳ [Attempt $attempts] client.hasActiveCall() = $hasCall")
+                if (hasCall) {
                     isWaitingToAnswer = false
+                    Log.d("VBotPhone", "📞 Gọi client.answerCall()...")
                     client.answerCall()
+                    val callSink = CallSink(
+                        name = nameCall,
+                        state = "connecting",
+                        isIncoming = true,
+                        isMute = isMute,
+                        onHold = onHold,
+                        message = "📞 [Bắt Máy Thành Công] client.answerCall() đã được gọi (hasActiveCall=true sau $attempts lần thử)"
+                    )
+                    events?.success(callSink.toMap())
                 } else if (attempts < 30) {
+                    if (attempts == 1 || attempts % 3 == 0) {
+                        val callSink = CallSink(
+                            name = nameCall,
+                            state = currentCallState,
+                            isIncoming = isIncoming,
+                            isMute = isMute,
+                            onHold = onHold,
+                            message = "⏳ [Chờ SIP INVITE] Lần thử $attempts/30: hasActiveCall=false (Đang chờ gói tin SIP từ máy chủ...)"
+                        )
+                        events?.success(callSink.toMap())
+                    }
                     attempts++
-                    handler.postDelayed(this, 500)
+                    handler.postDelayed(this, 300)
                 } else {
                     isWaitingToAnswer = false
+                    Log.e("VBotPhone", "❌ Không tìm thấy cuộc gọi active để trả lời (timeout sau 30 attempts)")
+                    val callSink = CallSink(
+                        name = nameCall,
+                        state = currentCallState,
+                        isIncoming = isIncoming,
+                        isMute = isMute,
+                        onHold = onHold,
+                        message = "❌ [Timeout Bắt Máy] Không tìm thấy cuộc gọi active (hasActiveCall=false sau 30 lần thử / 9s). Chưa nhận được SIP INVITE hoặc AutoCall đã huỷ cuộc gọi."
+                    )
+                    events?.success(callSink.toMap())
                 }
             }
         }
@@ -452,14 +1074,26 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
     }
 
     private fun hangUp(call: MethodCall) {
+        // ══ TRACKING: đánh dấu user chủ động gác máy ══
+        localHangup = true
+        val hasCall = if (clientExists()) client.hasActiveCall() else false
+        Log.d("VBotPhone", "🔴 Native hangUp() called, hasActiveCall=$hasCall, currentCallState=$currentCallState")
+        Log.d("VBotPhone", "📞 [TRACKING] localHangup=true, wasConfirmed=$wasConfirmed, isIncoming=$isIncoming")
+        val callSink = CallSink(
+            name = nameCall,
+            state = "disconnected",
+            isIncoming = isIncoming,
+            isMute = isMute,
+            onHold = onHold,
+            message = "🔴 [Native HangUp] Thực thi client.endCall()..."
+        )
+        events?.success(callSink.toMap())
         client.endCall()
         resultWrapper?.success(null)
     }
 
     private fun mute(call: MethodCall) {
         isMute = !isMute
-        // Following VBot-Android reference app: use AudioManager directly
-        // Do NOT use client.muteCall() as it has inverted internal logic
         try {
             val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
             audioManager.isMicrophoneMute = isMute
@@ -468,11 +1102,12 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
             Log.e("VBotPhone", "Error setting isMicrophoneMute: ${e.message}")
         }
         val callSink = CallSink(
-            nameCall,
-            currentCallState,
-            isIncoming,
-            isMute,
-            onHold
+            name = nameCall,
+            state = currentCallState,
+            isIncoming = isIncoming,
+            isMute = isMute,
+            onHold = onHold,
+            message = "🎙️ [Mic] Trạng thái Mic: ${if (isMute) "Đã tắt Mic (Muted)" else "Đã bật Mic (Unmuted)"}"
         )
         events?.success(callSink.toMap())
         resultWrapper?.success(null)
@@ -482,23 +1117,49 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
         isSpeaker = !isSpeaker
         client.onOffSpeaker(isSpeaker)
         Log.d("VBotPhone", "speaker toggled: isSpeaker=$isSpeaker")
+        val callSink = CallSink(
+            name = nameCall,
+            state = currentCallState,
+            isIncoming = isIncoming,
+            isMute = isMute,
+            onHold = onHold,
+            message = "🔊 [Loa] Trạng thái Loa: ${if (isSpeaker) "Loa ngoài (Speaker ON)" else "Loa trong (Earpiece)"}"
+        )
+        events?.success(callSink.toMap())
         resultWrapper?.success(null)
     }
 
     private fun sendDTMF(call: MethodCall) {
         val value = ((call.arguments as? Map<*, *>)?.get("value") ?: "") as String
         client.sendDTMF(value)
+        val callSink = CallSink(
+            name = nameCall,
+            state = currentCallState,
+            isIncoming = isIncoming,
+            isMute = isMute,
+            onHold = onHold,
+            message = "🔢 [DTMF] Gửi phím: $value"
+        )
+        events?.success(callSink.toMap())
         resultWrapper?.success(null)
     }
 
     private fun hold(call: MethodCall) {
         onHold = !onHold
+        val callSink = CallSink(
+            name = nameCall,
+            state = currentCallState,
+            isIncoming = isIncoming,
+            isMute = isMute,
+            onHold = onHold,
+            message = "⏸️ [Hold] Trạng thái giữ máy: $onHold"
+        )
+        events?.success(callSink.toMap())
         resultWrapper?.success(null)
     }
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
         MainActivity.events = events
-        // Nếu có cuộc gọi đang active, emit trạng thái hiện tại cho Flutter
         emitCurrentCallState()
     }
 
@@ -513,13 +1174,19 @@ open class CallSink(
     var isIncoming: Boolean,
     var isMute: Boolean,
     var onHold: Boolean,
+    var endedReason: String? = null,
+    var endedBy: String? = null,
+    var message: String? = null
 ) {
-    fun toMap(): Map<String, Any> = mapOf(
+    fun toMap(): Map<String, Any?> = mapOf(
         "name" to name,
         "state" to state,
         "isIncoming" to isIncoming,
         "isMute" to isMute,
         "onHold" to onHold,
+        "endedReason" to endedReason,
+        "endedBy" to endedBy,
+        "message" to message
     )
 }
 
