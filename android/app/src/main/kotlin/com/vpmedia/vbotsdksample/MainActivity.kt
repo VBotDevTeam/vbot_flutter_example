@@ -142,24 +142,20 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
 
         fun enableSdkLogging() {
             try {
-                val clz = Class.forName("com.vpmedia.sdkvbot.client.VBotLogger")
-                val instanceField = clz.getDeclaredField("INSTANCE")
-                val logger = instanceField.get(null)
-                val debugField = clz.getDeclaredField("debugMode")
-                debugField.isAccessible = true
-                debugField.set(logger, true)
-                Log.i("VBotPhone", "🚀 [SDK-LOGGER] Đã kích hoạt VBotLogger.debugMode = true thành công!")
+                if (clientExists()) {
+                    client.setupLogger(true)
+                }
+                Log.i("VBotPhone", "🚀 [SDK-LOGGER] Đã kích hoạt VBotLogger.debugMode = true!")
             } catch (e: Exception) {
-                Log.w("VBotPhone", "⚠️ [SDK-LOGGER] Không thể gán debugMode qua reflection: ${e.message}")
+                Log.w("VBotPhone", "⚠️ [SDK-LOGGER] Lỗi enableSdkLogging: ${e.message}")
             }
         }
 
         fun initClient(context: Context) {
-            enableSdkLogging()
             if (clientExists()) return
             client = VBotClient(context)
-            client.setup(VBotConfig(VBotEnvironment.STAGING))
-            enableSdkLogging()
+            client.setup(VBotConfig(VBotEnvironment.STAGING, debugMode = true))
+            client.setupLogger(true)
         }
 
         fun getEndReasonVietnamese(reason: VBotEndCallReason): String {
@@ -691,7 +687,10 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler,
                     }
 
                     // SDK đã tự động quản lý NetworkCallback bên trong (VBotClient.registerNetworkMonitor)
-                    // và tự động kích hoạt handleIpChange() kèm debounce 1000ms.
+                    // và tự động kích hoạt handleIpChange() kèm debounce. Gọi thêm ở đây làm fallback an toàn:
+                    if (clientExists() && client.hasActiveCall()) {
+                        client.handleNetworkReconnected()
+                    }
                 }
 
                 override fun onLost(network: Network) {

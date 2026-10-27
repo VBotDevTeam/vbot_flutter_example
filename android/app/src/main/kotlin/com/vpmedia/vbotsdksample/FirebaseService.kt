@@ -66,44 +66,91 @@ class FirebaseService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        Log.d("VBotPhone", "FirebaseService -> onNewToken: $token")
+        MainActivity.tokenFirebase = token
+        
+        if (MainActivity.events != null) {
+            Handler(Looper.getMainLooper()).post {
+                val callSink = CallSink(
+                    name = MainActivity.nameCall,
+                    state = MainActivity.currentCallState,
+                    isIncoming = MainActivity.isIncoming,
+                    isMute = MainActivity.isMute,
+                    onHold = MainActivity.onHold,
+                    message = "🔑 [FCM Token Mới]: $token"
+                )
+                MainActivity.events?.success(callSink.toMap())
+            }
+        }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         val map = HashMap(remoteMessage.data)
+        val notifTitle = remoteMessage.notification?.title ?: ""
+        val notifBody = remoteMessage.notification?.body ?: ""
 
-        if (map.containsKey("transId")) {
-            val callerName = map["name"] ?: ""
+        Log.d("VBotPhone", "FirebaseService -> onMessageReceived: data=$map, notifTitle=$notifTitle, notifBody=$notifBody, isForeground=${MainActivity.isForeground}")
+
+        val hasCallInfo = map.containsKey("transId") || map.containsKey("callId") || map.containsKey("hotline")
+
+        if (hasCallInfo) {
+            val callerName = map["name"] ?: map["caller"] ?: "AutoCall / Khách hàng"
+            val hotline = map["hotline"] ?: ""
+            val transId = map["transId"] ?: map["callId"] ?: ""
+            MainActivity.currentTransId = transId
+            
             if (callerName.isNotEmpty()) {
                 MainActivity.nameCall = callerName
                 MainActivity.isIncoming = true
             }
             MainActivity.currentCallState = "incoming"
-            Log.d("VBotPhone", "FirebaseService -> incoming call from: $callerName, data=$map")
 
             MainActivity.initClient(applicationContext)
             registerIncomingCallListener()
 
-            // Dùng notification của SDK
-            MainActivity.client.notificationCall(map)
+            // Gọi notificationCall của SDK để xử lý SIP incoming
+            try {
+                MainActivity.client.notificationCall(map)
+                Log.d("VBotPhone", "FirebaseService -> client.notificationCall(map) thành công")
+            } catch (e: Exception) {
+                Log.e("VBotPhone", "FirebaseService -> client.notificationCall(map) lỗi: ${e.message}")
+            }
 
-            // Khi Flutter đang ở foreground, đẩy trạng thái incoming qua EventChannel
-            // trước khi hủy notification SDK. Nếu Flutter chưa sẵn sàng thì giữ notification
-            // native để người dùng vẫn có thể nhận cuộc gọi.
-            if (MainActivity.isForeground && MainActivity.events != null) {
+            // Gửi log chi tiết sang Flutter Box Log
+            if (MainActivity.events != null) {
                 Handler(Looper.getMainLooper()).post {
                     val callSink = CallSink(
-                        MainActivity.nameCall,
-                        "incoming",
-                        true,
-                        MainActivity.isMute,
-                        MainActivity.onHold
+                        name = MainActivity.nameCall,
+                        state = "incoming",
+                        isIncoming = true,
+                        isMute = MainActivity.isMute,
+                        onHold = MainActivity.onHold,
+                        message = "📩 [FCM Push Cuộc Gọi Đến]: Tên=$callerName, Hotline=$hotline, TransId=$transId, Payload=$map"
                     )
                     MainActivity.events?.success(callSink.toMap())
 
-                    try {
-                        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                        notificationManager.cancelAll()
-                    } catch (_: Exception) {}
+                    // Nếu app đang foreground thì cancel system notification banner để tránh che UI
+                    if (MainActivity.isForeground) {
+                        try {
+                            val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                            notificationManager.cancelAll()
+                        } catch (_: Exception) {}
+                    }
+                }
+            }
+        } else {
+            // Push không phải cuộc gọi hoặc format khác
+            if (MainActivity.events != null) {
+                Handler(Looper.getMainLooper()).post {
+                    val callSink = CallSink(
+                        name = MainActivity.nameCall,
+                        state = MainActivity.currentCallState,
+                        isIncoming = MainActivity.isIncoming,
+                        isMute = MainActivity.isMute,
+                        onHold = MainActivity.onHold,
+                        message = "📩 [FCM Push Nhận Được]: data=$map, notification=$notifTitle / $notifBody"
+                    )
+                    MainActivity.events?.success(callSink.toMap())
                 }
             }
         }

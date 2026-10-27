@@ -37,7 +37,9 @@ class _MyHomePageState extends State<MyHomePage> {
             if (sink.state == 'disconnected' || sink.state == 'none') return;
 
             final isIncomingRinging =
-                (sink.state == 'incoming' || sink.state == 'confirmed') &&
+                (sink.state == 'incoming' ||
+                        sink.state == 'confirmed' ||
+                        sink.state == 'connecting') &&
                     sink.isIncoming;
 
             final isOutgoingCalling =
@@ -70,7 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     _scrollController.dispose();
-    vbotManager.dispose();
     super.dispose();
   }
 
@@ -121,7 +122,10 @@ class ConnectViewWidget extends StatefulWidget {
 class _ConnectViewWidgetState extends State<ConnectViewWidget> {
   final vbotManager = VBotPhoneManager();
 
-  final tokenController = TextEditingController();
+  final tokenController = TextEditingController(
+    text:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJWYWx1ZSI6IjIyLTE1Ny0zNi00MyJ9.lbE3ExHza6t8kcMrT9BPQGmtCUz_l1F3Pk9WX7OrQ3w',
+  );
   final phoneController = TextEditingController();
   final phoneFocusNode = FocusNode();
 
@@ -192,7 +196,10 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     }
 
     try {
-      final result = await vbotManager.connect(tokenController.text.trim());
+      final result = await vbotManager.connect(
+        tokenController.text.trim(),
+        environment: 'STAGING',
+      );
 
       if (result != null) {
         setState(() {
@@ -268,7 +275,7 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
           await vbotManager.startCall(input, input, hotlineNumber);
       callee = calleeName ?? "Error";
     } catch (e) {
-      print("call exception: $e");
+      debugPrint("call exception: $e");
     } finally {
       setState(() {
         isCalling = false;
@@ -307,7 +314,9 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
                       isConnected ? "Đã kết nối" : "Chưa kết nối",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isConnected ? Colors.green.shade700 : Colors.grey.shade700,
+                        color: isConnected
+                            ? Colors.green.shade700
+                            : Colors.grey.shade700,
                       ),
                     ),
                   ],
@@ -316,7 +325,8 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.person_outline, size: 20, color: Colors.blueGrey),
+                      const Icon(Icons.person_outline,
+                          size: 20, color: Colors.blueGrey),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
@@ -370,7 +380,8 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
                   OutlinedButton.icon(
                     onPressed: _disconnect,
                     icon: const Icon(Icons.link_off, color: Colors.red),
-                    label: const Text("Ngắt kết nối", style: TextStyle(color: Colors.red)),
+                    label: const Text("Ngắt kết nối",
+                        style: TextStyle(color: Colors.red)),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.red),
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -429,10 +440,14 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
                         });
                       }
                     },
-                    items: hotlines.map<DropdownMenuItem<VBotHotline>>((VBotHotline value) {
-                      final labelText = (value.name.isNotEmpty && value.name != value.phoneNumber)
+                    items: hotlines.map<DropdownMenuItem<VBotHotline>>(
+                        (VBotHotline value) {
+                      final labelText = (value.name.isNotEmpty &&
+                              value.name != value.phoneNumber)
                           ? "${value.name} - ${value.phoneNumber}"
-                          : value.name.isNotEmpty ? value.name : value.phoneNumber;
+                          : value.name.isNotEmpty
+                              ? value.name
+                              : value.phoneNumber;
                       return DropdownMenuItem<VBotHotline>(
                         value: value,
                         child: Text(
@@ -447,7 +462,8 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
                   TextField(
                     focusNode: phoneFocusNode,
                     controller: phoneController,
-                    keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                        signed: true, decimal: true),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9+*#]')),
                     ],
@@ -466,7 +482,8 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
                               phoneController.text.trim().length < 6)
                           ? 'Mã nhánh thành viên'
                           : 'Số điện thoại / Mã nhánh',
-                      hintText: 'Nhập số điện thoại hoặc mã nhánh (ví dụ: 101)...',
+                      hintText:
+                          'Nhập số điện thoại hoặc mã nhánh (ví dụ: 101)...',
                       helperText: (phoneController.text.trim().isNotEmpty &&
                               phoneController.text.trim().length < 6)
                           ? 'Tự động gọi nội bộ (không qua Hotline)'
@@ -496,7 +513,8 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
                                   phoneController.text.trim().length < 6)
                               ? "Gọi thành viên"
                               : "Gọi điện"),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -515,3 +533,4 @@ class _ConnectViewWidgetState extends State<ConnectViewWidget> {
     );
   }
 }
+

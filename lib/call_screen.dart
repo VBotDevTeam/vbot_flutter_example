@@ -13,6 +13,17 @@ class CallPage extends StatefulWidget {
 class _CallPageState extends State<CallPage> {
   final vbotManager = VBotPhoneManager();
   late final StreamSubscription<VBotSink> _sub;
+  bool _hasPopped = false;
+
+  void _safePop() {
+    if (_hasPopped || !mounted) return;
+    _hasPopped = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -25,9 +36,7 @@ class _CallPageState extends State<CallPage> {
     if (current == null ||
         current.state == 'disconnected' ||
         current.state == 'none') {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) Navigator.pop(context);
-      });
+      _safePop();
       // Vẫn tạo subscription (sẽ bị cancel trong dispose)
       _sub = vbotManager.callStateStream.listen((_) {});
       return;
@@ -37,13 +46,13 @@ class _CallPageState extends State<CallPage> {
       (vbotSink) {
         if (mounted) {
           if (vbotSink.state == 'disconnected' || vbotSink.state == 'none') {
-            Navigator.pop(context);
+            _safePop();
           } else {
             setState(() {});
           }
         }
       },
-      onError: (error) => print("Error in callStateStream: $error"),
+      onError: (error) => debugPrint("Error in callStateStream: $error"),
     );
   }
 
@@ -76,7 +85,7 @@ class CallStateWidget extends StatefulWidget {
   final VBotSink? sink;
 
   @override
-  _CallStateWidgetState createState() => _CallStateWidgetState();
+  State<CallStateWidget> createState() => _CallStateWidgetState();
 }
 
 class _CallStateWidgetState extends State<CallStateWidget> {

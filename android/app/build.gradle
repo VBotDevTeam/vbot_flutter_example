@@ -66,8 +66,8 @@ flutter {
 }
 
 dependencies {
-    // implementation 'com.github.VBotDevTeam:VBotPhoneSDKAndroid-Public:1.1.4'
-    implementation files('libs/SDKVBot-release.aar')
+    implementation 'com.github.VBotDevTeam:VBotPhoneSDKAndroid-Public:1.1.5'
+    // implementation files('libs/SDKVBot-release.aar')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'com.google.android.material:material:1.12.0'

@@ -37,6 +37,10 @@ class VBotPhoneManager {
       final Map<String, dynamic> map = Map<String, dynamic>.from(event as Map);
       final sink = VBotSink.fromMap(map);
       currentSink = sink;
+      debugPrint("📱 [Flutter VBot] Event: state=${sink.state}, endedReason=${sink.endedReason}, endedBy=${sink.endedBy}");
+      if (sink.message != null && sink.message!.isNotEmpty) {
+        debugPrint("📝 [Flutter VBot] Message:\n${sink.message}");
+      }
       _callStateController.add(sink);
     } catch (e, st) {
       debugPrint("Error parsing event: $e");
